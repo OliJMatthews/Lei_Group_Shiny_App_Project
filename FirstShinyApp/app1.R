@@ -2,10 +2,10 @@ library(shiny)
 library(tidyverse)
 
 # Reads UK Births and Deaths
-UKBirths <- read.table("Z:/My Documents/RShiny Stuff/UKBirths.txt", header=TRUE, quote="\"")
-UKDeaths <- read.table("Z:/My Documents/RShiny Stuff/UKDeaths.txt", header=TRUE, quote="\"")
-AustriaBirths <- read.table("Z:/My Documents/RShiny Stuff/AustriaBirths.txt", header=TRUE, quote="\"")
-AustriaDeaths <- read.table("Z:/My Documents/RShiny Stuff/AustriaDeaths.txt", header=TRUE, quote="\"")
+UKBirths <- read.table("Lei_Group_Shiny_App_Project/UKBirths.txt", header=TRUE, quote="\"")
+UKDeaths <- read.table("Lei_Group_Shiny_App_Project/UKDeaths.txt", header=TRUE, quote="\"")
+AustriaBirths <- read.table("Lei_Group_Shiny_App_Project/AustriaBirths.txt", header=TRUE, quote="\"")
+AustriaDeaths <- read.table("Lei_Group_Shiny_App_Project/AustriaDeaths.txt", header=TRUE, quote="\"")
 
 # Adding Country, Pivoting Longer to add Sex Column and removing Total
 UKBirths <- UKBirths %>% 
