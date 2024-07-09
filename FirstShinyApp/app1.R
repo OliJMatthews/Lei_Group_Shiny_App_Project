@@ -10,10 +10,10 @@ DenmarkBirths <- read.table("/Lei_Group_Shiny_App_Project/DenmarkBirths.txt", he
 DenmarkDeaths <- read.table("/Lei_Group_Shiny_App_Project/DenmarkDeaths.txt", header=TRUE, quote="\"")
 IrelandBirths <- read.table("/Lei_Group_Shiny_App_Project/IrelandBirths.txt", header=TRUE, quote="\"")
 IrelandDeaths <- read.table("/Lei_Group_Shiny_App_Project/IrelandDeaths.txt", header=TRUE, quote="\"")
-NorwayBirths <- read.table("/Lei_Group_Shiny_App_Project/IrelandBirths.txt", header=TRUE, quote="\"")
-NorwayDeaths <- read.table("/Lei_Group_Shiny_App_Project/IrelandDeaths.txt", header=TRUE, quote="\"")
-SwitzerlandBirths <- read.table("/Lei_Group_Shiny_App_Project/IrelandBirths.txt", header=TRUE, quote="\"")
-SwitzerlandDeaths <- read.table("/Lei_Group_Shiny_App_Project/IrelandDeaths.txt", header=TRUE, quote="\"")
+NorwayBirths <- read.table("/Lei_Group_Shiny_App_Project/NorwayBirths.txt", header=TRUE, quote="\"")
+NorwayDeaths <- read.table("/Lei_Group_Shiny_App_Project/NorwayDeaths.txt", header=TRUE, quote="\"")
+SwitzerlandBirths <- read.table("/Lei_Group_Shiny_App_Project/SwitzerlandBirths.txt", header=TRUE, quote="\"")
+SwitzerlandDeaths <- read.table("/Lei_Group_Shiny_App_Project/SwitzerlandDeaths.txt", header=TRUE, quote="\"")
 
 
 # Adding Country, Pivoting Longer to add Sex Column and removing Total
@@ -24,7 +24,8 @@ UKBirths <- UKBirths %>%
 UKDeaths <- UKDeaths %>% 
   mutate(Country="UK") %>% 
   pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-  mutate(Total=NULL)
+  mutate(Total=NULL,Age=NULL)
+
 
 AustriaBirths <- AustriaBirths %>% 
   mutate(Country="Austria") %>% 
@@ -33,7 +34,8 @@ AustriaBirths <- AustriaBirths %>%
 AustriaDeaths <- AustriaDeaths %>% 
   mutate(Country="Austria") %>% 
   pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-  mutate(Total=NULL)
+  mutate(Total=NULL,Age=NULL)
+
 
 DenmarkBirths <- DenmarkBirths %>% 
   mutate(Country="Denmark") %>% 
@@ -42,7 +44,7 @@ DenmarkBirths <- DenmarkBirths %>%
 DenmarkDeaths <- DenmarkDeaths %>% 
   mutate(Country="Denmark") %>% 
   pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-  mutate(Total=NULL)
+  mutate(Total=NULL,Age=NULL)
 
 IrelandBirths <- IrelandBirths %>% 
   mutate(Country="Ireland") %>% 
@@ -51,7 +53,8 @@ IrelandBirths <- IrelandBirths %>%
 IrelandDeaths <- IrelandDeaths %>% 
   mutate(Country="Ireland") %>% 
   pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-  mutate(Total=NULL)
+  mutate(Total=NULL,Age=NULL)
+
 
 NorwayBirths <- NorwayBirths %>% 
   mutate(Country="Norway") %>% 
@@ -60,7 +63,7 @@ NorwayBirths <- NorwayBirths %>%
 NorwayDeaths <- NorwayDeaths %>% 
   mutate(Country="Norway") %>% 
   pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-  mutate(Total=NULL)
+  mutate(Total=NULL,Age=NULL)
 
 SwitzerlandBirths <- SwitzerlandBirths %>% 
   mutate(Country="Switzerland") %>% 
@@ -69,14 +72,13 @@ SwitzerlandBirths <- SwitzerlandBirths %>%
 SwitzerlandDeaths <- SwitzerlandDeaths %>% 
   mutate(Country="Switzerland") %>% 
   pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-  mutate(Total=NULL)
-
-
-
+  mutate(Total=NULL,Age=NULL)
 
 Births <- bind_rows(AustriaBirths,UKBirths,DenmarkBirths,IrelandBirths,NorwayBirths,SwitzerlandBirths)
 Deaths <- bind_rows(AustriaDeaths,UKDeaths,DenmarkDeaths,IrelandDeaths,NorwayDeaths,SwitzerlandDeaths)
 
+Deaths <- Deaths %>% group_by(Year,Country,Sex) %>% 
+  summarise(value=sum(value))
 
 ui <- fluidPage(
     titlePanel("Human Mortality Database"),
@@ -105,23 +107,27 @@ output$countryB <- renderText(input$country[2])
     
 # UK Births and Deaths
 output$chartB1 <- renderPlot(
-  ggplot(BirthsexA() ,aes(x=Year,y=value,fill=Sex))+
-      geom_col()+
+  ggplot(BirthsexA() ,aes(x=Year,y=value,color=Sex))+
+      geom_point()+
+    geom_smooth(se=F)+
     labs(title="Births over Time",ylab=""))
 
 output$chartD1 <- renderPlot(
-  ggplot(DeathsexA() ,aes(x=Year,y=value,fill=Sex))+
-    geom_col()+
+  ggplot(DeathsexA() ,aes(x=Year,y=value,color=Sex))+
+    geom_point()+
+    geom_smooth(se=F)+
     labs(title="Deaths over Time",ylab=""))
 
 output$chartB2 <- renderPlot(
-  ggplot(BirthsexB() ,aes(x=Year,y=value,fill=Sex))+
-    geom_col()+
+  ggplot(BirthsexB() ,aes(x=Year,y=value,color=Sex))+
+    geom_point()+
+    geom_smooth(se=F)+
     labs(title="Births over Time",ylab=""))
 
 output$chartD2 <- renderPlot(
-  ggplot(DeathsexB() ,aes(x=Year,y=value,fill=Sex))+
-    geom_col()+
+  ggplot(DeathsexB() ,aes(x=Year,y=value,color=Sex))+
+    geom_point()+
+    geom_smooth(se=F)+
     labs(title="Deaths over Time",ylab=""))
 }
 
