@@ -1,19 +1,20 @@
 library(shiny)
 library(tidyverse)
+library(HMDHFDplus)
 
 # Reads UK Births and Deaths
-UKBirths <- read.table("/Lei_Group_Shiny_App_Project/UKBirths.txt", header=TRUE, quote="\"")
-UKDeaths <- read.table("/Lei_Group_Shiny_App_Project/UKDeaths.txt", header=TRUE, quote="\"")
-AustriaBirths <- read.table("/Lei_Group_Shiny_App_Project/AustriaBirths.txt", header=TRUE, quote="\"")
-AustriaDeaths <- read.table("/Lei_Group_Shiny_App_Project/AustriaDeaths.txt", header=TRUE, quote="\"")
-DenmarkBirths <- read.table("/Lei_Group_Shiny_App_Project/DenmarkBirths.txt", header=TRUE, quote="\"")
-DenmarkDeaths <- read.table("/Lei_Group_Shiny_App_Project/DenmarkDeaths.txt", header=TRUE, quote="\"")
-IrelandBirths <- read.table("/Lei_Group_Shiny_App_Project/IrelandBirths.txt", header=TRUE, quote="\"")
-IrelandDeaths <- read.table("/Lei_Group_Shiny_App_Project/IrelandDeaths.txt", header=TRUE, quote="\"")
-NorwayBirths <- read.table("/Lei_Group_Shiny_App_Project/NorwayBirths.txt", header=TRUE, quote="\"")
-NorwayDeaths <- read.table("/Lei_Group_Shiny_App_Project/NorwayDeaths.txt", header=TRUE, quote="\"")
-SwitzerlandBirths <- read.table("/Lei_Group_Shiny_App_Project/SwitzerlandBirths.txt", header=TRUE, quote="\"")
-SwitzerlandDeaths <- read.table("/Lei_Group_Shiny_App_Project/SwitzerlandDeaths.txt", header=TRUE, quote="\"")
+UKBirths <- readHMDweb("GBR_NP","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+UKDeaths <- readHMDweb("GBR_NP","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+AustriaBirths <- readHMDweb("AUT","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+AustriaDeaths <- readHMDweb("AUT","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+DenmarkBirths <- readHMDweb("DNK","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+DenmarkDeaths <- readHMDweb("DNK","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+IrelandBirths <- readHMDweb("IRL","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+IrelandDeaths <- readHMDweb("IRL","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+NorwayBirths <- readHMDweb("NOR","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+NorwayDeaths <- readHMDweb("NOR","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+SwitzerlandBirths <- readHMDweb("CHE","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+SwitzerlandDeaths <- readHMDweb("CHE","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
 
 
 # Adding Country, Pivoting Longer to add Sex Column and removing Total
