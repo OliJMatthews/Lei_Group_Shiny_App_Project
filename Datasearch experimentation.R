@@ -9,7 +9,6 @@ country_search <- function(CountryNameA,CountryNameB){
 Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HKG", "HUN",
            "ISL", "IRL", "ISR", "ITA","JPN","LVA","LTU","LUX","NLD","NZL_NP","NOR","POL","PRT","KOR","RUS","SVK", "SLV","ESP",
            "SWE","CHE","TWN","GBR_NP","USA","UKR")
-
 CountryData <- data.frame(Country,Codes)
   #Extract country code
   CountryA <- which(CountryData$Country==CountryNameA)
@@ -33,6 +32,7 @@ CountryData <- data.frame(Country,Codes)
     mutate(Country=Country[CountryA]) %>% 
     pivot_longer(c("Male","Female"),names_to="Sex") %>% 
     mutate(Total=NULL,Age=NULL,OpenInterval=NULL)
+  
   BirthsB <- BirthsB %>% 
     mutate(Country=Country[CountryB]) %>% 
     pivot_longer(c("Male","Female"),names_to="Sex") %>% 
@@ -69,3 +69,5 @@ CountryData <- data.frame(Country,Codes)
               "Deaths" = Deaths,
               "DeathRate" = DeathRate))
 }
+  
+
