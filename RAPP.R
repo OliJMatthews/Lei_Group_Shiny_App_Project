@@ -1,4 +1,3 @@
-library(shiny)
 library(tidyverse)
 
 # Reads UK Births and Deaths
@@ -78,59 +77,31 @@ Births <- bind_rows(AustriaBirths,UKBirths,DenmarkBirths,IrelandBirths,NorwayBir
 Deaths <- bind_rows(AustriaDeaths,UKDeaths,DenmarkDeaths,IrelandDeaths,NorwayDeaths,SwitzerlandDeaths)
 
 Deaths <- Deaths %>% group_by(Year,Country,Sex) %>% 
-   summarise(value=sum(value))
-
-ui <- fluidPage(
-    titlePanel("Human Mortality Database"),
-    sidebarLayout(
-        sidebarPanel(
-          checkboxGroupInput("sex","Sex:",c("Male","Female")),
-          selectInput("country","Country (select 2):",c("UK","Austria","Denmark","Ireland","Norway","Switzerland"),multiple=TRUE)
-        ),
-        mainPanel(
-           column(6,textOutput("countryA"),plotOutput("chartB1"),
-           plotOutput("chartD1")),
-           column(6,textOutput("countryB"),plotOutput("chartB2"), plotOutput("chartD2"))
-        )
-    )
-)
-
-server <- function(input, output) {
-BirthsexA<- reactive({BirthSexA <- filter(Births,Sex==input$sex,Country==input$country[1])})
-DeathsexA <- reactive({DeathSexA <- filter(Deaths,Sex==input$sex,Country==input$country[1])})
-
-BirthsexB<- reactive({BirthSexB <- filter(Births,Sex==input$sex,Country==input$country[2])})
-DeathsexB <- reactive({DeathSexB <- filter(Deaths,Sex==input$sex,Country==input$country[2])})
-
-output$countryA <- renderText(input$country[1])
-output$countryB <- renderText(input$country[2])
-    
-# UK Births and Deaths
-output$chartB1 <- renderPlot(
-  ggplot(BirthsexA() ,aes(x=Year,y=value,color=Sex))+
-      geom_point()+
-    geom_smooth(se=F)+
-    labs(title="Births over Time",ylab=""))
-
-output$chartD1 <- renderPlot(
-  ggplot(DeathsexA() ,aes(x=Year,y=value,color=Sex))+
-    geom_point()+
-    geom_smooth(se=F)+
-    labs(title="Deaths over Time",ylab=""))
-
-output$chartB2 <- renderPlot(
-  ggplot(BirthsexB() ,aes(x=Year,y=value,color=Sex))+
-    geom_point()+
-    geom_smooth(se=F)+
-    labs(title="Births over Time",ylab=""))
-
-output$chartD2 <- renderPlot(
-  ggplot(DeathsexB() ,aes(x=Year,y=value,color=Sex))+
-    geom_point()+
-    geom_smooth(se=F)+
-    labs(title="Deaths over Time",ylab=""))
-} 
+  summarise(value=sum(value))
 
 
+# Inputs
+Country <- c("UK","Switzerland")
+SexVector <- c("Male","Female")
 
-shinyApp(ui = ui, server = server)
+BirthSexA <- filter(Births,Sex==SexVector,Country==Country[1])
+DeathSexA <- filter(Deaths,Sex==SexVector,Country==Country[1])
+BirthSexB <- filter(Births,Sex==SexVector,Country==Country[2])
+DeathSexB <- filter(Deaths,Sex==SexVector,Country==Country[2])
+
+ggplot(BirthSexA ,aes(x=Year,y=value,color=Sex))+
+  geom_point()
+  geom_smooth(se=F)+
+  labs(title="Births over Time",ylab="Number of Births")
+ggplot(DeathSexA ,aes(x=Year,y=value,color=Sex))+
+  geom_point()+
+  geom_smooth(se=F)+
+  labs(title="Deaths over Time",ylab="Number of Deaths")
+ggplot(BirthSexB ,aes(x=Year,y=value,color=Sex))+
+  geom_point()+
+  geom_smooth(se=F)+
+  labs(title="Births over Time",ylab="")
+ggplot(DeathSexB ,aes(x=Year,y=value,color=Sex))+
+  geom_point()+
+  geom_smooth(se=F)+
+  labs(title="Deaths over Time",ylab="")
