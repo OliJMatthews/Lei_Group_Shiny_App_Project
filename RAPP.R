@@ -77,17 +77,18 @@ Births <- bind_rows(AustriaBirths,UKBirths,DenmarkBirths,IrelandBirths,NorwayBir
 Deaths <- bind_rows(AustriaDeaths,UKDeaths,DenmarkDeaths,IrelandDeaths,NorwayDeaths,SwitzerlandDeaths)
 
 Deaths <- Deaths %>% group_by(Year,Country,Sex) %>% 
-  summarise(value=sum(value))
+  mutate(value=sum(value)) %>% 
+  distinct()
 
 
 # Inputs
 Country <- c("UK","Switzerland")
-SexVector <- c("Male","Female")
+SexVector <- c("Male")
 
-BirthSexA <- filter(Births,Sex==SexVector,Country==Country[1])
-DeathSexA <- filter(Deaths,Sex==SexVector,Country==Country[1])
-BirthSexB <- filter(Births,Sex==SexVector,Country==Country[2])
-DeathSexB <- filter(Deaths,Sex==SexVector,Country==Country[2])
+BirthSexA <- filter(Births,Sex==SexVector[1]|Sex==SexVector[2],Country==Country[1])
+DeathSexA <- filter(Deaths,Sex==SexVector[1]|Sex==SexVector[2],Country==Country[1])
+BirthSexB <- filter(Births,Sex==SexVector[1]|Sex==SexVector[2],Country==Country[2])
+DeathSexB <- filter(Deaths,Sex==SexVector[1]|Sex==SexVector[2],Country==Country[2])
 
 ggplot(BirthSexA ,aes(x=Year,y=value,color=Sex))+
   geom_point()

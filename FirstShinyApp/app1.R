@@ -78,7 +78,8 @@ Births <- bind_rows(AustriaBirths,UKBirths,DenmarkBirths,IrelandBirths,NorwayBir
 Deaths <- bind_rows(AustriaDeaths,UKDeaths,DenmarkDeaths,IrelandDeaths,NorwayDeaths,SwitzerlandDeaths)
 
 Deaths <- Deaths %>% group_by(Year,Country,Sex) %>% 
-   summarise(value=sum(value))
+  mutate(value=sum(value)) %>% 
+  distinct()
 
 ui <- fluidPage(
     titlePanel("Human Mortality Database"),
@@ -96,11 +97,11 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-BirthsexA<- reactive({BirthSexA <- filter(Births,Sex==input$sex,Country==input$country[1])})
-DeathsexA <- reactive({DeathSexA <- filter(Deaths,Sex==input$sex,Country==input$country[1])})
+BirthsexA<- reactive({BirthSexA <- filter(Births,Sex==input$sex[1]|Sex==input$sex[2],Country==input$country[1])})
+DeathsexA <- reactive({DeathSexA <- filter(Deaths,Sex==input$sex[1]|Sex==input$sex[2],Country==input$country[1])})
 
-BirthsexB<- reactive({BirthSexB <- filter(Births,Sex==input$sex,Country==input$country[2])})
-DeathsexB <- reactive({DeathSexB <- filter(Deaths,Sex==input$sex,Country==input$country[2])})
+BirthsexB<- reactive({BirthSexB <- filter(Births,Sex==input$sex[1]|Sex==input$sex[2],Country==input$country[2])})
+DeathsexB <- reactive({DeathSexB <- filter(Deaths,Sex==input$sex[1]|Sex==input$sex[2],Country==input$country[2])})
 
 output$countryA <- renderText(input$country[1])
 output$countryB <- renderText(input$country[2])
