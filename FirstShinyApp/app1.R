@@ -12,9 +12,9 @@ DenmarkDeaths <- readHMDweb("DNK","Deaths_1x1","om119@leicester.ac.uk","Leiceste
 IrelandBirths <- readHMDweb("IRL","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
 IrelandDeaths <- readHMDweb("IRL","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
 NorwayBirths <- readHMDweb("NOR","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
-NorwayDeaths <- readHMDweb("NOR","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+NorwayDeaths <- readHMDweb("NOR","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
 SwitzerlandBirths <- readHMDweb("CHE","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
-SwitzerlandDeaths <- readHMDweb("CHE","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
+SwitzerlandDeaths <- readHMDweb("CHE","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
 
 
 # Adding Country, Pivoting Longer to add Sex Column and removing Total
@@ -87,8 +87,9 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
           checkboxGroupInput("sex","Sex:",c("Male","Female")),
-          selectInput("country","Country (select 2):",c("UK","Austria","Denmark","Ireland","Norway","Switzerland"),multiple=TRUE)
-        ),
+          selectInput("country","Country (select 2):",c("UK","Austria","Denmark","Ireland","Norway","Switzerland"),multiple=TRUE),
+          plotOutput("comparisonchart")
+          ),
         mainPanel(
            column(6,textOutput("countryA"),plotOutput("chartB1"),
            plotOutput("chartD1")),
@@ -106,32 +107,33 @@ DeathsexB <- reactive({DeathSexB <- filter(Deaths,Sex==input$sex[1]|Sex==input$s
 
 output$countryA <- renderText(input$country[1])
 output$countryB <- renderText(input$country[2])
-    
-# UK Births and Deaths
+
 output$chartB1 <- renderPlot(
   ggplot(BirthsexA() ,aes(x=Year,y=value,color=Sex))+
       geom_point()+
-    geom_smooth(se=F)+
+    geom_line()+
     labs(title="Births over Time",ylab=""))
 
 output$chartD1 <- renderPlot(
   ggplot(DeathsexA() ,aes(x=Year,y=value,color=Sex))+
     geom_point()+
-    geom_smooth(se=F)+
+    geom_line()+
     labs(title="Deaths over Time",ylab=""))
 
 output$chartB2 <- renderPlot(
   ggplot(BirthsexB() ,aes(x=Year,y=value,color=Sex))+
     geom_point()+
-    geom_smooth(se=F)+
+    geom_line()+
     labs(title="Births over Time",ylab=""))
 
 output$chartD2 <- renderPlot(
   ggplot(DeathsexB() ,aes(x=Year,y=value,color=Sex))+
     geom_point()+
-    geom_smooth(se=F)+
+    geom_line()+
     labs(title="Deaths over Time",ylab=""))
+
 } 
+
 
 
 
