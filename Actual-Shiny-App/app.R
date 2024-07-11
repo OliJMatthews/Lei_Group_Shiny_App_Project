@@ -2,6 +2,8 @@ library(shiny)
 library(tidyverse)
 library(bslib)
 library(HMDHFDplus)
+library(leaflet)
+
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
              "Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
              "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
@@ -82,16 +84,19 @@ ui <- page_navbar(
   underline = TRUE,
   nav_panel(title = "Welcome", p("First tab content.")),
   nav_panel(title = "Interactive Map",
+            p(leafletOutput("map"),
+              sliderInput("year","Year:",value=2000,min=1900,max=2024,step=1,sep="",width="100%"))),
+  nav_panel(title = "Simulation", 
             p(sidebarLayout(
               sidebarPanel(
                 checkboxGroupInput("sex","Sex:",c("Male","Female")),
                 selectInput("country","Country (select 2):",Country,multiple=TRUE),
+                radioButtons("type","Data:",c("Births","Deaths","Death Rates"))
               ),
               mainPanel(
                 tableOutput("table")
               )
-            ))),
-  nav_panel(title = "Simulation", p("Third tab content"))
+            )))
 )
 
 server <- function(input, output) {
@@ -102,7 +107,18 @@ server <- function(input, output) {
     return(result)
   })
   
-  output$table <-renderTable(data.sets()$Deaths)
+#  chosen.data.set <- reactive({
+ #   if(input$type=="Births"){chosen.data.set <- data.sets()$Births}  THIS DOSENT WORK YET
+ #   if(input$type=="Deaths"){chosen.data.set <- data.sets()$Deaths}
+#    if(input$type=="Death Rates"){chosen.data.set <- data.sets()$DeathRates}
+ # })
+  
+  output$table <-renderTable(data.sets()$Births)
+  
+  output$map <- renderLeaflet({
+    leaflet() %>% 
+      addTiles()
+  })
 }
 
 # Run the application 
