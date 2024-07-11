@@ -1,5 +1,6 @@
 library(shiny)
 library(tidyverse)
+library(bslib)
 library(HMDHFDplus)
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
              "Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
@@ -93,7 +94,6 @@ ui <- page_navbar(
   nav_panel(title = "Simulation", p("Third tab content"))
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
   data.sets <- reactive({
     input_valueA <- input$country[1]
