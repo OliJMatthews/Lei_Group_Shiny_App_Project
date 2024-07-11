@@ -1,15 +1,17 @@
-library(HMDHFDplus)
+library(shiny)
 library(tidyverse)
-# Takes the names of two countries and then returns the birth and death data in each.
+library(HMDHFDplus)
+
+# This function takes two countries and returns three date frames: Births, Deaths, Deathrates (Needs things, lots of NAs)
 country_search <- function(CountryNameA,CountryNameB){
   Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
-             "Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
-             "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
-             "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
-Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HKG", "HUN",
-           "ISL", "IRL", "ISR", "ITA","JPN","LVA","LTU","LUX","NLD","NZL_NP","NOR","POL","PRT","KOR","RUS","SVK", "SLV","ESP",
-           "SWE","CHE","TWN","GBR_NP","USA","UKR")
-CountryData <- data.frame(Country,Codes)
+               "Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
+               "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
+               "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
+  Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HKG", "HUN",
+             "ISL", "IRL", "ISR", "ITA","JPN","LVA","LTU","LUX","NLD","NZL_NP","NOR","POL","PRT","KOR","RUS","SVK", "SLV","ESP",
+             "SWE","CHE","TWN","GBR_NP","USA","UKR")
+  CountryData <- data.frame(Country,Codes)
   #Extract country code
   CountryA <- which(CountryData$Country==CountryNameA)
   CountryB <- which(CountryData$Country==CountryNameB)
@@ -47,7 +49,7 @@ CountryData <- data.frame(Country,Codes)
     mutate(Country=Country[CountryA]) %>% 
     pivot_longer(c("Male","Female"),names_to="Sex") %>% 
     mutate(Total=NULL,Age=NULL,OpenInterval=NULL)
-
+  
   DeathRateB <- DeathRateB %>% 
     mutate(Country=Country[CountryB]) %>% 
     pivot_longer(c("Male","Female"),names_to="Sex") %>% 
@@ -62,12 +64,38 @@ CountryData <- data.frame(Country,Codes)
     distinct()
   
   DeathRate <- DeathRate %>% group_by(Year,Country,Sex) %>% 
-    mutate(value=sum(value)) %>% 
+    mutate(value=mean(value)) %>% 
     distinct()
   
   return(list("Births" = Births,
               "Deaths" = Deaths,
               "DeathRate" = DeathRate))
 }
-  
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+  titlePanel("Human Mortality Database"),
+  sidebarLayout(
+    sidebarPanel(
+      checkboxGroupInput("sex","Sex:",c("Male","Female")),
+      selectInput("country","Country (select 2):",c("UK","Austria","Denmark","Ireland","Norway","Switzerland"),multiple=TRUE),
+    ),
+    mainPanel(
+      tableOutput("table")
+    )
+  )
+)
 
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  data.sets <- reactive({
+    input_valueA <- input$country[1]
+    input_valueB <- input$country[2]
+    result <- country_search(input_valueA,input_valueB)
+    return(result)
+  })
+  
+ output$table <-renderTable(data.sets()$DeathRate)
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
