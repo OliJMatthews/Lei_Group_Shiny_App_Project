@@ -1,0 +1,12 @@
+name: Human-Mortaliy-Database-Project
+title: Human-Mortaliy-Database-Project
+username: olijmatthews
+account: olijmatthews
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12305491
+bundleId:
+url: https://olijmatthews.shinyapps.io/Human-Mortaliy-Database-Project/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

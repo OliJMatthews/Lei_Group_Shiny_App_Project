@@ -75,17 +75,22 @@ country_search <- function(CountryNameA,CountryNameB){
               "DeathRate" = DeathRate))
 }
 # Define UI for application that draws a histogram
-ui <- fluidPage(
-  titlePanel("Human Mortality Database"),
-  sidebarLayout(
-    sidebarPanel(
-      checkboxGroupInput("sex","Sex:",c("Male","Female")),
-      selectInput("country","Country (select 2):",Country,multiple=TRUE),
-    ),
-    mainPanel(
-      tableOutput("table")
-    )
-  )
+ui <- page_navbar(
+  title = "Human Mortality Database",
+  bg = "#0062cc",
+  underline = TRUE,
+  nav_panel(title = "Welcome", p("First tab content.")),
+  nav_panel(title = "Interactive Map",
+            p(sidebarLayout(
+              sidebarPanel(
+                checkboxGroupInput("sex","Sex:",c("Male","Female")),
+                selectInput("country","Country (select 2):",Country,multiple=TRUE),
+              ),
+              mainPanel(
+                tableOutput("table")
+              )
+            ))),
+  nav_panel(title = "Simulation", p("Third tab content"))
 )
 
 # Define server logic required to draw a histogram
@@ -97,7 +102,7 @@ server <- function(input, output) {
     return(result)
   })
   
- output$table <-renderTable(data.sets()$Deaths)
+  output$table <-renderTable(data.sets()$Deaths)
 }
 
 # Run the application 
