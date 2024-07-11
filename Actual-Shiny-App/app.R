@@ -1,7 +1,10 @@
 library(shiny)
 library(tidyverse)
 library(HMDHFDplus)
-
+Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
+             "Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
+             "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
+             "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
 # This function takes two countries and returns three date frames: Births, Deaths, Deathrates (Needs things, lots of NAs)
 country_search <- function(CountryNameA,CountryNameB){
   Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
@@ -77,7 +80,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       checkboxGroupInput("sex","Sex:",c("Male","Female")),
-      selectInput("country","Country (select 2):",c("UK","Austria","Denmark","Ireland","Norway","Switzerland"),multiple=TRUE),
+      selectInput("country","Country (select 2):",Country,multiple=TRUE),
     ),
     mainPanel(
       tableOutput("table")
@@ -94,7 +97,7 @@ server <- function(input, output) {
     return(result)
   })
   
- output$table <-renderTable(data.sets()$DeathRate)
+ output$table <-renderTable(data.sets()$Deaths)
 }
 
 # Run the application 
