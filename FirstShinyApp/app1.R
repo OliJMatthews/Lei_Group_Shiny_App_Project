@@ -2,6 +2,8 @@ library(shiny)
 library(tidyverse)
 library(HMDHFDplus)
 
+source(country_search)
+
 # Reads UK Births and Deaths
 UKBirths <- readHMDweb("GBR_NP","Births","om119@leicester.ac.uk","LeicesterShinyProject2024!")
 UKDeaths <- readHMDweb("GBR_NP","Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!")
