@@ -88,7 +88,8 @@ ui <- page_navbar(
   nav_panel(title = "Welcome", p("First tab content.")),
   nav_panel(title = "Interactive Map",
             p(leafletOutput("map"),
-              sliderInput("year","Year:",value=2000,min=1900,max=2024,step=1,sep="",width="100%"))),
+              sliderInput("year","Year:",value=2000,min=1900,max=2024,step=1,sep="",width="100%"),
+              textOutput("country_name"))),
   nav_panel(title = "Simulation", 
             p(sidebarLayout(
               sidebarPanel(
@@ -121,11 +122,20 @@ server <- function(input, output) {
   output$map <- renderLeaflet({
     leaflet(world) %>%
       addTiles() %>%
-      addPolygons(data=world,color = "#444444", weight = 1, smoothFactor = 0.5,
+      addPolygons(data=world,color = c("green"), weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.5,
                   highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                      bringToFront = TRUE))
+                                                      bringToFront = TRUE),
+                  layerId = c("U.S.A.","U.K.","Ukraine","Taiwan","Switzerland","Sweden","Spain","Republic of Korea","Slovakia","Slovenia","Russia",
+                              "Portugal","Poland","Norway","New Zealand","Netherlands","Luxembourg","Lithuania","Latvia","Japan","Italy","Israel",
+                              "Ireland","Iceland","Hungary","Greece","Germany","France","Finland","Estonia","Denmark",
+                              "Czechia","Croatia","Chile","Canada","Bulgaria","Belgium,","Belarus","Austria","Australia"))
   })
+  observeEvent(input$map_shape_click, {
+    click <- input$map_shape_click
+    country_name <- click$id  # Extract the clicked country name
+    output$country_name <- renderText({
+      paste("You clicked on:", country_name)})})
 }
 
 # Run the application 
