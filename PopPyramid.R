@@ -8,17 +8,31 @@ data <- data.frame(
   Population = round(rnorm(100,100,10))
 )
 
+get_age_pyramid_data <- function(countryCode){
+  data <-readHMDweb(countryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+    select(-Female1,-Male1,-Total1) %>%
+    mutate(Male = Male2,Female = Female2) %>%
+    select(-Female2,-Male2) %>%
+    pivot_longer(cols = c(Male,Female),
+                 names_to = "Sex",
+                 values_to = "Population") %>%
+    select(Year,Age,Sex,Population)
+  return(data)
+}
 
-plot_age_pyramid <- function(df){
-  # Grouping data-frame into age groups
-  req(data)
+
+plot_age_pyramid <- function(df,filterYear){
+  req(df)
+  print(df)
   breaks <- c(seq(0, 100, by = 5),Inf)
   labels <- c(paste(seq(0,95,by=5),seq(5,100,by=5),sep="-"),"100+")
   df <- df %>% 
+    filter(Year == filterYear) %>%
+    select(-Year) %>%
     mutate(age_group = cut(Age,
                            breaks = breaks,
                            right = F,
-                           labels = labels))%>%
+                           labels = labels)) %>%
     mutate(age_group = factor(age_group, levels = labels)) %>%
     group_by(age_group,Sex) %>%
     summarise(count = sum(Population)) %>%
@@ -57,4 +71,4 @@ plot_age_pyramid <- function(df){
   
 }
 
-plot_age_pyramid(data)
+plot_age_pyramid(data,2002)
