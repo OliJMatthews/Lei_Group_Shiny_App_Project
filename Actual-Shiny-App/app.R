@@ -80,6 +80,88 @@ country_search <- function(CountryNameA,CountryNameB){
               "Deaths" = Deaths,
               "DeathRate" = DeathRate))
 }
+
+get_age_pyramid_data <- function(countryCode){
+  data <-readHMDweb(countryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+    select(-Female1,-Male1,-Total1) %>%
+    mutate(Male = Male2,Female = Female2) %>%
+    select(-Female2,-Male2) %>%
+    pivot_longer(cols = c(Male,Female),
+                 names_to = "Sex",
+                 values_to = "Population") %>%
+    select(Year,Age,Sex,Population)
+  return(data)
+}
+
+
+plot_age_pyramid <- function(countryCode,filterYear){
+  df <- get_age_pyramid_data(countryCode)
+  req(df)
+  breaks <- c(seq(0, 100, by = 5),Inf)
+  labels <- c(paste(seq(0,95,by=5),seq(5,100,by=5),sep="-"),"100+")
+  df <- df %>% 
+    filter(Year == filterYear) %>%
+    select(-Year) %>%
+    mutate(age_group = cut(Age,
+                           breaks = breaks,
+                           right = F,
+                           labels = labels)) %>%
+    mutate(age_group = factor(age_group, levels = labels)) %>%
+    group_by(age_group,Sex) %>%
+    summarise(count = sum(Population)) %>%
+    right_join(expand.grid(Sex = c("Male","Female"),
+                           age_group = factor(labels,levels = labels)),
+               by = c("Sex","age_group")) %>%
+    replace_na(list(count=0))
+  
+  
+  
+  popplot<- ggplot(df, 
+         aes(
+           x = age_group,
+           fill = Sex, 
+           y = ifelse(
+             test = Sex == "Male", 
+             yes = -count, 
+             no = count
+           )
+         )
+  ) + 
+    scale_y_continuous(
+      labels = abs, 
+      limits = max(df$count) * c(-1,1)
+    ) +
+    coord_flip() +
+    geom_bar(stat = "identity") +
+    theme_minimal() + 
+    labs(
+      x = " Group",
+      y = "Population Size",
+      fill = "Sex",
+      title = "Population Pyramid"
+    ) + 
+    theme(plot.title = element_text(hjust = 0.5))
+  return(popplot)
+}
+
+getCountryCode <- function(countryName){
+  Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
+                 "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
+                 "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
+                 "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
+  Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HUN",
+             "ISL", "IRL", "ISR", "ITA","JPN","LVA","LTU","LUX","NLD","NZL_NP","NOR","POL","PRT","KOR","RUS","SVK", "SLV","ESP",
+             "SWE","CHE","TWN","GBR_NP","USA","UKR")
+  
+  countryIndex <- which(Countries == countryName)
+  if (length(countryIndex) == 0) {
+    warning("Country name is invalid")
+    return(NULL)
+  }else{
+    return(Codes[countryIndex])
+  }
+}
+
 # Define UI for application that draws a histogram
 ui <- page_navbar(
   title = "Human Mortality Database",
@@ -87,7 +169,9 @@ ui <- page_navbar(
   underline = TRUE,
   nav_panel(title = "Welcome", p("First tab content.")),
   nav_panel(title = "Interactive Map",
-            p(leafletOutput("map"),
+            p(fluidRow(
+              column(6,leafletOutput("map")),
+              column(6,plotOutput("pyramid"))),
               sliderInput("year","Year:",value=2000,min=1900,max=2024,step=1,sep="",width="100%"),
               textOutput("country_name"))),
   nav_panel(title = "Simulation", 
@@ -111,11 +195,11 @@ server <- function(input, output) {
     return(result)
   })
   
-#  chosen.data.set <- reactive({
- #   if(input$type=="Births"){chosen.data.set <- data.sets()$Births}  THIS DOSENT WORK YET
- #   if(input$type=="Deaths"){chosen.data.set <- data.sets()$Deaths}
-#    if(input$type=="Death Rates"){chosen.data.set <- data.sets()$DeathRates}
- # })
+  #  chosen.data.set <- reactive({
+  #   if(input$type=="Births"){chosen.data.set <- data.sets()$Births}  THIS DOSENT WORK YET
+  #   if(input$type=="Deaths"){chosen.data.set <- data.sets()$Deaths}
+  #    if(input$type=="Death Rates"){chosen.data.set <- data.sets()$DeathRates}
+  # })
   
   output$table <-renderTable(data.sets()$Births)
   
@@ -129,13 +213,20 @@ server <- function(input, output) {
                   layerId = c("U.S.A.","U.K.","Ukraine","Taiwan","Switzerland","Sweden","Spain","Republic of Korea","Slovakia","Slovenia","Russia",
                               "Portugal","Poland","Norway","New Zealand","Netherlands","Luxembourg","Lithuania","Latvia","Japan","Italy","Israel",
                               "Ireland","Iceland","Hungary","Greece","Germany","France","Finland","Estonia","Denmark",
-                              "Czechia","Croatia","Chile","Canada","Bulgaria","Belgium,","Belarus","Austria","Australia"))
+                              "Czechia","Croatia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"))
   })
   observeEvent(input$map_shape_click, {
     click <- input$map_shape_click
     country_name <- click$id  # Extract the clicked country name
     output$country_name <- renderText({
       paste("You clicked on:", country_name)})})
+  
+  reactivepyramidctry <- reactive({click <- input$map_shape_click
+  country_name <- click$id
+  result <- getCountryCode(country_name)
+  return(result)})
+  
+  output$pyramid <- renderPlot(plot_age_pyramid(reactivepyramidctry(),input$year))
 }
 
 # Run the application 
