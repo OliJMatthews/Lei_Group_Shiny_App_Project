@@ -1,5 +1,6 @@
 library(HMDHFDplus)
 library(tidyverse)
+library(shiny)
 # Takes the names of two countries and then returns the birth and death data in each.
 country_search <- function(CountryNameA,CountryNameB){
   Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",

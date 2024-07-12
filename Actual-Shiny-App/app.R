@@ -3,18 +3,21 @@ library(tidyverse)
 library(bslib)
 library(HMDHFDplus)
 library(leaflet)
+library(sf)
+library(rnaturalearth)
 
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
-             "Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
+             "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
              "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
              "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
+world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America","South Korea")))
 # This function takes two countries and returns three date frames: Births, Deaths, Deathrates (Needs things, lots of NAs)
 country_search <- function(CountryNameA,CountryNameB){
   Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
-               "Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
+               "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
                "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
                "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
-  Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HKG", "HUN",
+  Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HUN",
              "ISL", "IRL", "ISR", "ITA","JPN","LVA","LTU","LUX","NLD","NZL_NP","NOR","POL","PRT","KOR","RUS","SVK", "SLV","ESP",
              "SWE","CHE","TWN","GBR_NP","USA","UKR")
   CountryData <- data.frame(Country,Codes)
@@ -116,8 +119,12 @@ server <- function(input, output) {
   output$table <-renderTable(data.sets()$Births)
   
   output$map <- renderLeaflet({
-    leaflet() %>% 
-      addTiles()
+    leaflet(world) %>%
+      addTiles() %>%
+      addPolygons(data=world,color = "#444444", weight = 1, smoothFactor = 0.5,
+                  opacity = 1.0, fillOpacity = 0.5,
+                  highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                      bringToFront = TRUE))
   })
 }
 
