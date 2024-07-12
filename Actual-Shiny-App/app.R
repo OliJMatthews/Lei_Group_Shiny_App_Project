@@ -121,7 +121,7 @@ server <- function(input, output) {
   output$map <- renderLeaflet({
     leaflet(world) %>%
       addTiles() %>%
-      addPolygons(data=world,color = "#444444", weight = 1, smoothFactor = 0.5,
+      addPolygons(data=world,color = c("green","blue","red","brown","black","white","orange","purple"), weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.5,
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE))
