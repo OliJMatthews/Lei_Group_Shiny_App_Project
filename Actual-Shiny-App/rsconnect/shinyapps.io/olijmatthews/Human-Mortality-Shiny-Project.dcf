@@ -1,0 +1,12 @@
+name: Human-Mortality-Shiny-Project
+title: Human-Mortality-Shiny-Project
+username: olijmatthews
+account: olijmatthews
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12305504
+bundleId: 8852025
+url: https://olijmatthews.shinyapps.io/Human-Mortality-Shiny-Project/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

@@ -12,7 +12,7 @@ Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", 
 CountryData <- data.frame(Country,Codes)
   #Extract country code
   CountryA <- which(CountryData$Country==CountryNameA)
-  CountryB <- which(CountryData$Country==CountryNameA)
+  CountryB <- which(CountryData$Country==CountryNameB)
   CodeA <- CountryData$Codes[CountryA]
   CodeB <- CountryData$Codes[CountryB]
   
@@ -49,7 +49,7 @@ CountryData <- data.frame(Country,Codes)
     mutate(Total=NULL,Age=NULL,OpenInterval=NULL)
 
   DeathRateB <- DeathRateB %>% 
-    mutate(Country=Country[CountryA]) %>% 
+    mutate(Country=Country[CountryB]) %>% 
     pivot_longer(c("Male","Female"),names_to="Sex") %>% 
     mutate(Total=NULL,Age=NULL,OpenInterval=NULL)
   
