@@ -156,7 +156,7 @@ ui <- page_navbar(
             h1("Welcome to the welcome page"),
             h2("Functionality:"),
             tags$ul(
-              tags$li("Hello World"),
+              tags$li("Hello World1"),
               tags$li("Hello World2")
             ),
             div(style = "position: absolute; bottom:0;",
