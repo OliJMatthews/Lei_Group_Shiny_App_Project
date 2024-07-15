@@ -172,7 +172,7 @@ ui <- page_navbar(
             p(fluidRow(
               column(6,leafletOutput("map")),
               column(6,plotOutput("pyramid"))),
-              sliderInput("year","Year:",value=2000,min=1900,max=2024,step=1,sep="",width="100%"),
+              sliderInput("year","Year:",value=2000,min=1960,max=2020,step=1,sep="",width="100%"),
               textOutput("country_name"))),
   nav_panel(title = "Simulation", 
             p(sidebarLayout(
