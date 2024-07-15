@@ -171,7 +171,8 @@ ui <- page_navbar(
   nav_panel(title = "Interactive Map",
             p(fluidRow(
               column(6,leafletOutput("map")),
-              column(6,plotOutput("pyramid"))),
+              column(6,plotOutput("pyramid"),
+                     textOutput("prompttext"))),
               sliderInput("year","Year:",value=2000,min=1960,max=2020,step=1,sep="",width="100%"),
               textOutput("country_name"))),
   nav_panel(title = "Simulation", 
@@ -226,8 +227,18 @@ server <- function(input, output) {
   result <- getCountryCode(country_name)
   return(result)})
   
-  output$pyramid <- renderPlot(plot_age_pyramid(reactivepyramidctry(),input$year))
+  output$pyramid <- renderPlot({req(input$map_shape_click)
+                               
+    plot_age_pyramid(reactivepyramidctry(),input$year)})
+  
+  output$prompttext <- renderText({req(!isTruthy(input$map_shape_click))
+    return("Please Click on a Country")})
 }
+
+  
+
+
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
