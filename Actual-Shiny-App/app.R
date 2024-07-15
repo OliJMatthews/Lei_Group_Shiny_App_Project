@@ -54,31 +54,16 @@ country_search <- function(CountryNameA,CountryNameB){
     pivot_longer(c("Male","Female"),names_to="Sex") %>% 
     mutate(Total=NULL,Age=NULL,OpenInterval=NULL)
   
-  DeathRateA <- DeathRateA %>% 
-    mutate(Country=Country[CountryA]) %>% 
-    pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-    mutate(Total=NULL,Age=NULL,OpenInterval=NULL)
-  
-  DeathRateB <- DeathRateB %>% 
-    mutate(Country=Country[CountryB]) %>% 
-    pivot_longer(c("Male","Female"),names_to="Sex") %>% 
-    mutate(Total=NULL,Age=NULL,OpenInterval=NULL)
-  
   Births <- bind_rows(BirthsA,BirthsB)
   Deaths <- bind_rows(DeathsA,DeathsB)
-  DeathRate <- bind_rows(DeathRateA,DeathRateB)
   
   Deaths <- Deaths %>% group_by(Year,Country,Sex) %>% 
     mutate(value=sum(value)) %>% 
     distinct()
   
-  DeathRate <- DeathRate %>% group_by(Year,Country,Sex) %>% 
-    mutate(value=mean(value)) %>% 
-    distinct()
   
   return(list("Births" = Births,
-              "Deaths" = Deaths,
-              "DeathRate" = DeathRate))
+              "Deaths" = Deaths))
 }
 
 get_age_pyramid_data <- function(countryCode){
@@ -209,7 +194,6 @@ server <- function(input, output) {
   #  chosen.data.set <- reactive({
   #   if(input$type=="Births"){chosen.data.set <- data.sets()$Births}  THIS DOSENT WORK YET
   #   if(input$type=="Deaths"){chosen.data.set <- data.sets()$Deaths}
-  #    if(input$type=="Death Rates"){chosen.data.set <- data.sets()$DeathRates}
   # })
   
   output$table <-renderTable(data.sets()$Births)
