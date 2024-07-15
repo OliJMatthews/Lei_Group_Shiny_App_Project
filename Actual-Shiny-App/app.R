@@ -175,7 +175,7 @@ ui <- page_navbar(
               sidebarPanel(
                 checkboxGroupInput("sex","Sex:",c("Male","Female")),
                 selectInput("country","Country (select 2):",Country,multiple=TRUE),
-                radioButtons("type","Data:",c("Births","Deaths","Death Rates"))
+                radioButtons("type","Data:",c("Births","Deaths"))
               ),
               mainPanel(
                 tableOutput("table")
