@@ -99,7 +99,7 @@ plot_age_pyramid <- function(countryCode,filterYear){
                            right = F,
                            labels = labels)) %>%
     mutate(age_group = factor(age_group, levels = labels)) %>%
-    group_by(age_group,Sex) %>%
+    group_by(age_group,Sex,groups,.groups = "drop_last") %>%
     summarise(count = sum(Population)) %>%
     right_join(expand.grid(Sex = c("Male","Female"),
                            age_group = factor(labels,levels = labels)),
