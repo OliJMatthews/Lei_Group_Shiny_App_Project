@@ -13,4 +13,4 @@ OlisPopSim <- function(populationsize,birthprob,deathprob){
   return(list("Pop"=newpopulationsize,"Births"=birthcount,"Deaths"=deathcount))
 }
 
-OlisPopSim(10000000,0.2,0.05)
+OlisPopSim(100000,0.2,0.05)

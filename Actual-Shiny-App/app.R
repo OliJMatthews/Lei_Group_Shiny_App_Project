@@ -152,6 +152,18 @@ getCountryCode <- function(countryName){
     return(Codes[countryIndex])
   }
 }
+OlisPopSim <- function(populationsize,birthprob,deathprob){
+  birthcount <- 0
+  deathcount <- 0
+  for(i in 1:populationsize){
+    udeath <- runif(1,0,1)
+    if(udeath<deathprob){deathcount <- deathcount+1}
+    ubirth <- runif(1,0,1)
+    if(ubirth<birthprob){birthcount <- birthcount+1}
+  }
+  newpopulationsize <- populationsize+birthcount-deathcount
+  return(list("Pop"=newpopulationsize,"Births"=birthcount,"Deaths"=deathcount))
+}
 
 # Define UI for application that draws a histogram
 ui <- page_navbar(
@@ -180,15 +192,16 @@ ui <- page_navbar(
   nav_panel(title = "Simulation", 
             p(sidebarLayout(
               sidebarPanel(
-                checkboxGroupInput("sex","Sex:",c("Male","Female")),
-                selectInput("country","Country (select 2):",Country,multiple=TRUE),
-                radioButtons("type","Data:",c("Births","Deaths"))
+                numericInput("popsize","Population Size",10000,min=0,max=100000000),
+                numericInput("birthprob","Probability of Birth:",0.30,min=0,max=1),
+                numericInput("deathprob","Probability of Death:",0.30,min=0,max=1)
               ),
               mainPanel(
-                tableOutput("table")
+               textOutput("popsim")
               )
-            )))
-)
+            ))
+  ))
+
 
 server <- function(input, output) {
   data.sets <- reactive({
@@ -235,6 +248,7 @@ server <- function(input, output) {
     country_name <- click$id
     description(test_df,input$year,country_name)})
 
+  output$popsim <- renderText(OlisPopSim(input$popsize,input$birthprob,input$deathprob)$Pop)
 }
 
 
