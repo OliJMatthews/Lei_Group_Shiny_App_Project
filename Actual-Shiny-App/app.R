@@ -16,7 +16,7 @@ Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chil
              "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
              "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
 world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America","South Korea")))
-# This function takes two countries and returns three date frames: Births, Deaths, 
+TotalPopulationData <- read_csv("TotalPopulationData",col_types = cols(...1 = col_skip()))
 country_search <- function(CountryNameA,CountryNameB){
   Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
                "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
@@ -74,7 +74,6 @@ description <- function(df,year,country){
   a <- filter(df,Year==year & Country==country)
   return(a$Description)
 }
-
 get_age_pyramid_data <- function(countryCode){
   data <-readHMDweb(countryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
     select(-Female1,-Male1,-Total1) %>%
@@ -194,7 +193,8 @@ ui <- page_navbar(
               sidebarPanel(
                 numericInput("popsize","Population Size",10000,min=0,max=100000000),
                 numericInput("birthprob","Probability of Birth:",0.30,min=0,max=1),
-                numericInput("deathprob","Probability of Death:",0.30,min=0,max=1)
+                numericInput("deathprob","Probability of Death:",0.30,min=0,max=1),
+                actionButton("generatepop","Generate")
               ),
               mainPanel(
                textOutput("popsim")
@@ -211,10 +211,10 @@ server <- function(input, output) {
     return(result)
   })
   
-  output$table <-renderTable(data.sets()$Births)
+
   
   output$map <- renderLeaflet({
-    leaflet(world) %>%
+    leaflet() %>%
       addTiles() %>%
       addPolygons(data=world,color = c("green"), weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.5,
@@ -223,7 +223,8 @@ server <- function(input, output) {
                   layerId = c("U.S.A.","U.K.","Ukraine","Taiwan","Switzerland","Sweden","Spain","Republic of Korea","Slovakia","Slovenia","Russia",
                               "Portugal","Poland","Norway","New Zealand","Netherlands","Luxembourg","Lithuania","Latvia","Japan","Italy","Israel",
                               "Ireland","Iceland","Hungary","Greece","Germany","France","Finland","Estonia","Denmark",
-                              "Czechia","Croatia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"))
+                              "Czechia","Croatia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"),
+                  label=round(yearpopdata()$Total)) # this is not working for some stupid reason
   })
   observeEvent(input$map_shape_click, {
     click <- input$map_shape_click
@@ -248,7 +249,9 @@ server <- function(input, output) {
     country_name <- click$id
     description(test_df,input$year,country_name)})
 
-  output$popsim <- renderText(OlisPopSim(input$popsize,input$birthprob,input$deathprob)$Pop)
+  observeEvent(input$generatepop, output$popsim <- renderText(OlisPopSim(input$popsize,input$birthprob,input$deathprob)$Pop))
+  
+  yearpopdata <- reactive({yearpopdata <- filter(TotalPopulationData,Year==input$year)})
 }
 
 
