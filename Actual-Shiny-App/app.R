@@ -6,12 +6,17 @@ library(leaflet)
 library(sf)
 library(rnaturalearth)
 
+test_df <- data.frame(
+  Year = c("1989","2000"),
+  Country = c("Taiwan","U.K."),
+  Description = c("TestA","TestB")
+)
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
              "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
              "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
              "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
 world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America","South Korea")))
-# This function takes two countries and returns three date frames: Births, Deaths, Deathrates (Needs things, lots of NAs)
+# This function takes two countries and returns three date frames: Births, Deaths, 
 country_search <- function(CountryNameA,CountryNameB){
   Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
                "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
@@ -65,6 +70,10 @@ country_search <- function(CountryNameA,CountryNameB){
   return(list("Births" = Births,
               "Deaths" = Deaths))
 }
+description <- function(df,year,country){
+  a <- filter(df,Year==year & Country==country)
+  return(a$Description)
+}
 
 get_age_pyramid_data <- function(countryCode){
   data <-readHMDweb(countryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
@@ -77,8 +86,6 @@ get_age_pyramid_data <- function(countryCode){
     select(Year,Age,Sex,Population)
   return(data)
 }
-
-
 plot_age_pyramid <- function(countryCode,filterYear){
   df <- get_age_pyramid_data(countryCode)
   req(df)
@@ -102,15 +109,15 @@ plot_age_pyramid <- function(countryCode,filterYear){
   
   
   popplot<- ggplot(df, 
-         aes(
-           x = age_group,
-           fill = Sex, 
-           y = ifelse(
-             test = Sex == "Male", 
-             yes = -count, 
-             no = count
-           )
-         )
+                   aes(
+                     x = age_group,
+                     fill = Sex, 
+                     y = ifelse(
+                       test = Sex == "Male", 
+                       yes = -count, 
+                       no = count
+                     )
+                   )
   ) + 
     scale_y_continuous(
       labels = abs, 
@@ -128,7 +135,6 @@ plot_age_pyramid <- function(countryCode,filterYear){
     theme(plot.title = element_text(hjust = 0.5))
   return(popplot)
 }
-
 getCountryCode <- function(countryName){
   Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
                  "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
@@ -169,7 +175,8 @@ ui <- page_navbar(
               column(6,plotOutput("pyramid"),
                      textOutput("prompttext"))),
               sliderInput("year","Year:",value=2000,min=1950,max=2020,step=1,sep="",width="100%"),
-              textOutput("country_name"))),
+              textOutput("country_name"),
+              textOutput("description"))),
   nav_panel(title = "Simulation", 
             p(sidebarLayout(
               sidebarPanel(
@@ -190,11 +197,6 @@ server <- function(input, output) {
     result <- country_search(input_valueA,input_valueB)
     return(result)
   })
-  
-  #  chosen.data.set <- reactive({
-  #   if(input$type=="Births"){chosen.data.set <- data.sets()$Births}  THIS DOSENT WORK YET
-  #   if(input$type=="Deaths"){chosen.data.set <- data.sets()$Deaths}
-  # })
   
   output$table <-renderTable(data.sets()$Births)
   
@@ -222,14 +224,20 @@ server <- function(input, output) {
   return(result)})
   
   output$pyramid <- renderPlot({req(input$map_shape_click)
-                               
+    
     plot_age_pyramid(reactivepyramidctry(),input$year)})
   
   output$prompttext <- renderText({req(!isTruthy(input$map_shape_click))
     return("Please Click on a Country")})
+  
+  output$description <- renderText({req(input$map_shape_click)
+    click <- input$map_shape_click
+    country_name <- click$id
+    description(test_df,input$year,country_name)})
+
 }
 
-  
+
 
 
 

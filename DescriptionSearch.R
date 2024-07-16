@@ -1,15 +1,16 @@
 library(tidyverse)
-# test_df <- data.frame(
-#   Year = c(1989),
-#   Country = c("China"),
-#   Description = c("Tianamen Square")
-# )
+test_df <- data.frame(
+  Year = c(1989,2000),
+  Country = c("China","DPRK"),
+  Description = c("Tianamen Square","KIM JONG UM")
+)
 
-descriptionSearch <- function(data, Year, Country){
+descriptionSearch <- function(data, year, country){
   description <- data %>% 
-  filter(Year == Year && Country == Country) %>% 
-  select(Description)
-  return(description$Description)
+    filter(Year == year) %>% 
+    filter(Country==country)
+  result <- description$Description
+return(result)
 }
 
-descriptionSearch(test_df,1989,China)
+descriptionSearch(test_df,2000,"DPRK")
