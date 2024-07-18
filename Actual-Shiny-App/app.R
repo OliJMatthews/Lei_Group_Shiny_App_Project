@@ -229,10 +229,8 @@ server <- function(input, output) {
                   layerId = c("U.S.A.","U.K.","Switzerland","Sweden","Spain","Slovakia",
                               "Portugal","Norway","New Zealand","Netherlands","Japan","Italy",
                               "Ireland","Iceland","Hungary","France","Finland","Denmark",
-                              "Czechia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"),
-                  label=round(yearpopdata()$Total),
-                  fillColor = pal(yearpopdata()$Total)) # for some reason australia follows us for a bit? need to fix
-  })
+                              "Czechia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"))
+                  })
   observeEvent(input$map_shape_click, {
     click <- input$map_shape_click
     country_name <- click$id  # Extract the clicked country name
