@@ -63,5 +63,6 @@ calculateRates <- function(CountryName){
   return(combined)
 }
 
-data <- reduce(lapply(Countries,calculateRates),rbind)
-save(data, file = "Rates.csv")
+Rates <- reduce(lapply(Countries,calculateRates),rbind)
+Rates <- data.frame(data)
+write.csv(data,"Rates.csv")
