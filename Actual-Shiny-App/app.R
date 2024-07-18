@@ -5,26 +5,27 @@ library(HMDHFDplus)
 library(leaflet)
 library(sf)
 library(rnaturalearth)
+library(RColorBrewer)
 
 test_df <- data.frame(
   Year = c("1989","2000"),
   Country = c("Taiwan","U.K."),
   Description = c("TestA","TestB")
 )
-Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
-             "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
-             "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
-             "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
-world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America","South Korea")))
+Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
+             "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
+             "Netherlands","New Zealand","Norway","Portugal",
+             "Slovakia","Spain","Sweden","Switzerland","U.K.","U.S.A.")
+world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America")))
 TotalPopulationData <- read_csv("TotalPopulationData",col_types = cols(...1 = col_skip()))
 country_search <- function(CountryNameA,CountryNameB){
-  Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
-               "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
-               "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
-               "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
-  Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HUN",
-             "ISL", "IRL", "ISR", "ITA","JPN","LVA","LTU","LUX","NLD","NZL_NP","NOR","POL","PRT","KOR","RUS","SVK", "SLV","ESP",
-             "SWE","CHE","TWN","GBR_NP","USA","UKR")
+  Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
+               "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
+               "Netherlands","New Zealand","Norway","Portugal",
+               "Slovakia","Spain","Sweden","Switzerland","U.K.","U.S.A.")
+  Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","CZE", "DNK",  "FIN","FRATNP",  "HUN",
+             "ISL", "IRL",  "ITA","JPN","NLD","NZL_NP","NOR","PRT","SVK","ESP",
+             "SWE","CHE","GBR_NP","USA")
   CountryData <- data.frame(Country,Codes)
   #Extract country code
   CountryA <- which(CountryData$Country==CountryNameA)
@@ -98,7 +99,7 @@ plot_age_pyramid <- function(countryCode,filterYear){
                            right = F,
                            labels = labels)) %>%
     mutate(age_group = factor(age_group, levels = labels)) %>%
-    group_by(age_group,Sex,groups,.groups = "drop_last") %>%
+    group_by(age_group,Sex) %>%
     summarise(count = sum(Population)) %>%
     right_join(expand.grid(Sex = c("Male","Female"),
                            age_group = factor(labels,levels = labels)),
@@ -135,13 +136,13 @@ plot_age_pyramid <- function(countryCode,filterYear){
   return(popplot)
 }
 getCountryCode <- function(countryName){
-  Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
-                 "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
-                 "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
-                 "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
-  Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","HRV","CZE", "DNK", "EST", "FIN","FRATNP", "DEUTNP", "GRC", "HUN",
-             "ISL", "IRL", "ISR", "ITA","JPN","LVA","LTU","LUX","NLD","NZL_NP","NOR","POL","PRT","KOR","RUS","SVK", "SLV","ESP",
-             "SWE","CHE","TWN","GBR_NP","USA","UKR")
+  Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
+                 "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
+                 "Netherlands","New Zealand","Norway","Portugal",
+                 "Slovakia","Spain","Sweden","Switzerland","U.K.","U.S.A.")
+  Codes <-   Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","CZE", "DNK",  "FIN","FRATNP",  "HUN",
+                        "ISL", "IRL",  "ITA","JPN","NLD","NZL_NP","NOR","PRT","SVK","ESP",
+                        "SWE","CHE","GBR_NP","USA")
   
   countryIndex <- which(Countries == countryName)
   if (length(countryIndex) == 0) {
@@ -163,6 +164,8 @@ OlisPopSim <- function(populationsize,birthprob,deathprob){
   newpopulationsize <- populationsize+birthcount-deathcount
   return(list("Pop"=newpopulationsize,"Births"=birthcount,"Deaths"=deathcount))
 }
+pal <- colorNumeric(palette = "Spectral", domain = TotalPopulationData$Total,n=15,reverse=TRUE)
+
 
 # Define UI for application that draws a histogram
 ui <- page_navbar(
@@ -185,9 +188,13 @@ ui <- page_navbar(
               column(6,leafletOutput("map")),
               column(6,plotOutput("pyramid"),
                      textOutput("prompttext"))),
-              sliderInput("year","Year:",value=2000,min=1950,max=2020,step=1,sep="",width="100%"),
+              sliderInput("year","Year:",value=2000,min=1950,max=2018,step=1,sep="",width="100%"),
               textOutput("country_name"),
-              textOutput("description"))),
+              textOutput("description")),
+            fluidRow(
+              column(6,plotOutput("pyramid"),
+                     textOutput("prompttext")),
+              column(6,textOutput("description")))),
   nav_panel(title = "Simulation", 
             p(sidebarLayout(
               sidebarPanel(
@@ -197,7 +204,7 @@ ui <- page_navbar(
                 actionButton("generatepop","Generate")
               ),
               mainPanel(
-               textOutput("popsim")
+                textOutput("popsim")
               )
             ))
   ))
@@ -212,19 +219,19 @@ server <- function(input, output) {
   })
   
 
-  
   output$map <- renderLeaflet({
-    leaflet() %>%
+    leaflet(data=yearpopdata()$Total) %>%
       addTiles() %>%
       addPolygons(data=world,color = c("green"), weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.5,
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE),
-                  layerId = c("U.S.A.","U.K.","Ukraine","Taiwan","Switzerland","Sweden","Spain","Republic of Korea","Slovakia","Slovenia","Russia",
-                              "Portugal","Poland","Norway","New Zealand","Netherlands","Luxembourg","Lithuania","Latvia","Japan","Italy","Israel",
-                              "Ireland","Iceland","Hungary","Greece","Germany","France","Finland","Estonia","Denmark",
-                              "Czechia","Croatia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"),
-                  label=round(yearpopdata()$Total)) # this is not working for some stupid reason
+                  layerId = c("U.S.A.","U.K.","Switzerland","Sweden","Spain","Slovakia",
+                              "Portugal","Norway","New Zealand","Netherlands","Japan","Italy",
+                              "Ireland","Iceland","Hungary","France","Finland","Denmark",
+                              "Czechia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"),
+                  label=round(yearpopdata()$Total),
+                  fillColor = pal(yearpopdata()$Total)) # for some reason australia follows us for a bit? need to fix
   })
   observeEvent(input$map_shape_click, {
     click <- input$map_shape_click
@@ -248,10 +255,11 @@ server <- function(input, output) {
     click <- input$map_shape_click
     country_name <- click$id
     description(test_df,input$year,country_name)})
-
+  
   observeEvent(input$generatepop, output$popsim <- renderText(OlisPopSim(input$popsize,input$birthprob,input$deathprob)$Pop))
   
   yearpopdata <- reactive({yearpopdata <- filter(TotalPopulationData,Year==input$year)})
+  
 }
 
 
