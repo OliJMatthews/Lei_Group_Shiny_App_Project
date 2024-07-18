@@ -7,18 +7,18 @@ library(sf)
 library(rnaturalearth)
 library(RColorBrewer)
 
- test_df <- data.frame(
-   Year = c("1989","2000"),
-   Country = c("Taiwan","U.K."),
-   Description = c("TestA","TestB")
- )
+test_df <- data.frame(
+  Year = c("1989","2000"),
+  Country = c("Taiwan","U.K."),
+  Description = c("TestA","TestB")
+)
+Rates <- read_csv("Rates.csv", col_types = cols(...1 = col_skip()))
+Rates$Year <- as.integer(Rates$Year)
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
              "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
              "Netherlands","New Zealand","Norway","Portugal",
              "Slovakia","Spain","Sweden","Switzerland","U.K.","U.S.A.")
 world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America")))
-
-TotalPopulationData <- read_csv("TotalPopulationData",col_types = cols(...1 = col_skip()))
 country_search <- function(CountryNameA,CountryNameB){
   Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
                "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
@@ -165,7 +165,6 @@ OlisPopSim <- function(populationsize,birthprob,deathprob){
   newpopulationsize <- populationsize+birthcount-deathcount
   return(list("Pop"=newpopulationsize,"Births"=birthcount,"Deaths"=deathcount))
 }
-pal <- colorNumeric(palette = "Spectral", domain = TotalPopulationData$Total,n=15,reverse=TRUE)
 
 
 # Define UI for application that draws a histogram
@@ -187,15 +186,14 @@ ui <- page_navbar(
   nav_panel(title = "Interactive Map",
             p(fluidRow(
               column(6,leafletOutput("map")),
-              column(6,plotOutput("pyramid"),
-                     textOutput("prompttext"))),
+              column(6,radioButtons("longchoice","",choices = c("Births","Deaths","Population","Birth Rate","Death Rate")),
+                     plotOutput("createlongplot"))),
               sliderInput("year","Year:",value=2000,min=1950,max=2018,step=1,sep="",width="100%"),
-              textOutput("country_name"),
-              textOutput("description")),
+              textOutput("country_name"),),
             fluidRow(
               column(6,plotOutput("pyramid"),
                      textOutput("prompttext")),
-              column(6,textOutput("description")))),
+              column(6,textOutput("description"))),),
   nav_panel(title = "Simulation", 
             p(sidebarLayout(
               sidebarPanel(
@@ -221,7 +219,7 @@ server <- function(input, output) {
   
 
   output$map <- renderLeaflet({
-    leaflet(data=yearpopdata()$Total) %>%
+    leaflet() %>%
       addTiles() %>%
       addPolygons(data=world,color = c("green"), weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.5,
@@ -257,7 +255,18 @@ server <- function(input, output) {
   
   observeEvent(input$generatepop, output$popsim <- renderText(OlisPopSim(input$popsize,input$birthprob,input$deathprob)$Pop))
   
-  yearpopdata <- reactive({yearpopdata <- filter(TotalPopulationData,Year==input$year)})
+  output$createlongplot <- renderPlot({
+    req(input$map_shape_click)
+      click <- input$map_shape_click
+      country_name <- click$id
+      ratesadjusted <- filter(Rates,Country==country_name) 
+      if(input$longchoice=="Births"){
+      ggplot(ratesadjusted)+
+        geom_line(aes(x=Year,y=c(Male_Births,Female_Births,Total_Births)))}
+      })
+
+  
+  
   
 }
 
