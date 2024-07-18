@@ -7,16 +7,16 @@ library(sf)
 library(rnaturalearth)
 library(RColorBrewer)
 
-# test_df <- data.frame(
-#   Year = c("1989","2000"),
-#   Country = c("Taiwan","U.K."),
-#   Description = c("TestA","TestB")
-# )
-Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
-             "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
-             "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
-             "Slovakia","Slovenia","Spain","Sweden","Switzerland","Taiwan","U.K.","U.S.A.","Ukraine")
-world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America","South Korea")))
+ test_df <- data.frame(
+   Year = c("1989","2000"),
+   Country = c("Taiwan","U.K."),
+   Description = c("TestA","TestB")
+ )
+Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
+             "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
+             "Netherlands","New Zealand","Norway","Portugal",
+             "Slovakia","Spain","Sweden","Switzerland","U.K.","U.S.A.")
+world <- ne_countries(scale = "medium", returnclass = "sf",country=append(Country,c("United Kingdom","United States of America")))
 
 TotalPopulationData <- read_csv("TotalPopulationData",col_types = cols(...1 = col_skip()))
 country_search <- function(CountryNameA,CountryNameB){
