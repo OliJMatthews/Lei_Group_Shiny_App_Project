@@ -26,43 +26,46 @@ Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Ch
 
 calculateRates <- function(CountryName){
   CountryCode <- getCountryCode(CountryName)
-  Births <- readHMDweb(CountryCode,"Births","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+  birthsDF <- readHMDweb(CountryCode,"Births","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
     group_by(Year) %>%
     summarise(
-      Male_Births = sum(Male),
-      Female_Births = sum(Female),
-      Total_Births = sum(Total)
+      Male = sum(Male),
+      Female = sum(Female),
+      Total= sum(Total)
     ) %>%
-    mutate(Country = CountryName) 
-  
-  Deaths <- readHMDweb(CountryCode,"Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
-    group_by(Year) %>%
     mutate(Country = CountryName) %>%
+    pivot_longer(cols = - c(Year,Country),names_to = "Type",values_to = "Birth_Count")
+
+  deathsDF <- readHMDweb(CountryCode,"Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+    group_by(Year) %>%
     summarise(
-      Male_Deaths = sum(Male),
-      Female_Deaths = sum(Female),
-      Total_Deaths = sum(Total)
-    )
-  
-  Pop <- readHMDweb(CountryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+      Male = sum(Male),
+      Female = sum(Female),
+      Total= sum(Total)
+    ) %>%
+    mutate(Country = CountryName) %>%
+    pivot_longer(cols = - c(Year,Country),names_to = "Type",values_to = "Death_Count")
+
+  popDF <- readHMDweb(CountryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+    group_by(Year) %>%
     select(Year,Female2,Male2,Total2) %>%
     group_by(Year) %>%
-    summarise( Male_Pop = sum(Male2),
-              Female_Pop = sum(Female2),
-              Total_Pop = sum(Total2))
+    summarise( Male = sum(Male2),
+               Female = sum(Female2),
+               Total = sum(Total2)) %>%
+    mutate(Country = CountryName) %>%
+    pivot_longer(cols = - c(Year,Country),names_to = "Type",values_to = "Pop_Count")
 
-  combined <- inner_join(Deaths,Pop, by="Year") %>%
-    inner_join(Births, by = "Year") %>%
-    mutate(Male_Birth_Rate = Male_Births / Total_Pop * 1000) %>%
-    mutate(Female_Birth_Rate = Female_Births / Total_Pop * 1000) %>%
-    mutate(Total_Birth_Rate = Total_Births / Total_Pop * 1000) %>%
-    mutate(Male_Death_rate = Male_Deaths/ Total_Pop * 1000) %>%
-    mutate(Female_Death_rate = Female_Deaths/ Total_Pop * 1000) %>%
-    mutate(Total_Death_rate = Total_Deaths / Total_Pop * 1000)
+  combinedDF <- inner_join(birthsDF,deathsDF,by=c("Year","Country","Type")) %>%
+    inner_join(popDF,by=c("Year","Country","Type"))
 
-  return(combined)
+  return(combinedDF)
 }
 
+
+
+Rates <-calculateRates("Sweden")
+
 Rates <- reduce(lapply(Countries,calculateRates),rbind)
-Rates <- data.frame(data)
-write.csv(data,"Rates.csv")
+Rates <- data.frame(data) %>% relocate(Country)
+write.csv(Rates,"Rates.csv")
