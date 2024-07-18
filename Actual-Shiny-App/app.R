@@ -6,11 +6,11 @@ library(leaflet)
 library(sf)
 library(rnaturalearth)
 
-test_df <- data.frame(
-  Year = c("1989","2000"),
-  Country = c("Taiwan","U.K."),
-  Description = c("TestA","TestB")
-)
+# test_df <- data.frame(
+#   Year = c("1989","2000"),
+#   Country = c("Taiwan","U.K."),
+#   Description = c("TestA","TestB")
+# )
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Croatia","Czechia","Denmark","Estonia",
              "Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia",
              "Lithuania","Luxembourg","Netherlands","New Zealand","Norway","Poland","Portugal","Republic of Korea","Russia",
