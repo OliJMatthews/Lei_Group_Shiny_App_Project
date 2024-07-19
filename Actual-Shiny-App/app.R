@@ -184,16 +184,14 @@ ui <- page_navbar(
               column(6,plotOutput("pyramid"),
                      textOutput("prompttext")),
               column(6,textOutput("description"))),),
-  nav_panel(title = "Simulation", 
+  nav_panel(title = "Comparison", 
             p(sidebarLayout(
               sidebarPanel(
-                numericInput("popsize","Population Size",10000,min=0,max=100000000),
-                numericInput("birthprob","Probability of Birth:",0.30,min=0,max=1),
-                numericInput("deathprob","Probability of Death:",0.30,min=0,max=1),
-                actionButton("generatepop","Generate")
+                selectInput("countrycomp","Pick two countries to compare:",Country,multiple=TRUE),
+                radioButtons("comparisonchoice","",choices = c("Births","Deaths","Population","Birth Rate","Death Rate"))
               ),
               mainPanel(
-                textOutput("popsim")
+                plotOutput("comparisonplot")
               )
             ))
   ))
@@ -270,8 +268,32 @@ server <- function(input, output) {
           scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
       })
 
-  
-  
+  output$comparisonplot <- renderPlot({
+    req(input$countrycomp)
+    ratescomp <- Rates %>% 
+      filter(Country==input$countrycomp) %>% 
+      filter(Type=="Total")
+    if(input$comparisonchoice=="Births"){
+      ggplot(ratescomp)+
+        geom_line(aes(x=Year,y=Birth_Count,color=Country))+
+        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+    else if(input$comparisonchoice=="Deaths"){
+      ggplot(ratescomp)+
+        geom_line(aes(x=Year,y=Death_Count,color=Country))+
+        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+    else if(input$comparisonchoice=="Population"){
+      ggplot(ratescomp)+
+        geom_line(aes(x=Year,y=Pop_Count,color=Country))+
+        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+    else if(input$comparisonchoice=="Birth Rate"){
+      ggplot(ratescomp)+
+        geom_line(aes(x=Year,y=Birth_Rate,color=Country))+
+        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+    else if(input$comparisonchoice=="Death Rate"){
+      ggplot(ratescomp)+
+        geom_line(aes(x=Year,y=Death_Rate,color=Country))+
+        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+  })
   
 }
 
