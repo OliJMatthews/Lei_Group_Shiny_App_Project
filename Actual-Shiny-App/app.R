@@ -205,7 +205,7 @@ server <- function(input, output) {
     return(result)
   })
   
-
+  
   output$map <- renderLeaflet({
     leaflet() %>%
       addTiles() %>%
@@ -217,7 +217,7 @@ server <- function(input, output) {
                               "Portugal","Norway","New Zealand","Netherlands","Japan","Italy",
                               "Ireland","Iceland","Hungary","France","Finland","Denmark",
                               "Czechia","Chile","Canada","Bulgaria","Belgium","Belarus","Austria","Australia"))
-                  })
+  })
   observeEvent(input$map_shape_click, {
     click <- input$map_shape_click
     country_name <- click$id  # Extract the clicked country name
@@ -243,31 +243,33 @@ server <- function(input, output) {
   
   output$createlongplot <- renderPlot({
     req(input$map_shape_click)
-      click <- input$map_shape_click
-      country_name <- click$id
-      ratesadjusted <- filter(Rates,Country==country_name) 
-      if(input$longchoice=="Births"){
+    click <- input$map_shape_click
+    country_name <- click$id
+    ratesadjusted <- filter(Rates,Country==country_name) 
+    if(input$longchoice=="Births"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Birth_Count,color=Type))+
-           scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
-      else if(input$longchoice=="Deaths"){
-        ggplot(ratesadjusted)+
-          geom_line(aes(x=Year,y=Death_Count,color=Type))+
-          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
-      else if(input$longchoice=="Population"){
-        ggplot(ratesadjusted)+
-          geom_line(aes(x=Year,y=Pop_Count,color=Type))+
-          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
-      else if(input$longchoice=="Birth Rate"){
-        ggplot(ratesadjusted)+
-          geom_line(aes(x=Year,y=Birth_Rate,color=Type))+
-          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
-      else if(input$longchoice=="Death Rate"){
-        ggplot(ratesadjusted)+
-          geom_line(aes(x=Year,y=Death_Rate,color=Type))+
-          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
-      })
-
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
+        ylab("Number of Births")}
+    else if(input$longchoice=="Deaths"){
+      ggplot(ratesadjusted)+
+        geom_line(aes(x=Year,y=Death_Count,color=Type))+
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
+        ylab("Number of Deaths")}
+    else if(input$longchoice=="Population"){
+      ggplot(ratesadjusted)+
+        geom_line(aes(x=Year,y=Pop_Count,color=Type))+
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+    else if(input$longchoice=="Birth Rate"){
+      ggplot(ratesadjusted)+
+        geom_line(aes(x=Year,y=Birth_Rate,color=Type))+
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+    else if(input$longchoice=="Death Rate"){
+      ggplot(ratesadjusted)+
+        geom_line(aes(x=Year,y=Death_Rate,color=Type))+
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+  })
+  
   output$comparisonplot <- renderPlot({
     req(input$countrycomp)
     ratescomp <- Rates %>% 
@@ -276,23 +278,35 @@ server <- function(input, output) {
     if(input$comparisonchoice=="Births"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Birth_Count,color=Country))+
-        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+        scale_color_manual(values=c("gold2", "slategray4"))+
+        xlim(1950, 2018)+
+        ylab("Number of Births")}
     else if(input$comparisonchoice=="Deaths"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Death_Count,color=Country))+
-        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+        scale_color_manual(values=c("gold2", "slategray4"))+
+        xlim(1950, 2018)+
+        ylab("Number of Deaths")}
     else if(input$comparisonchoice=="Population"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Pop_Count,color=Country))+
-        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+        scale_color_manual(values=c("gold2", "slategray4"))+
+        xlim(1950, 2018)+
+        ylab("Population Size")}
     else if(input$comparisonchoice=="Birth Rate"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Birth_Rate,color=Country))+
-        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+        scale_color_manual(values=c("gold2", "slategray4"))+
+        xlim(1950, 2018)+
+        ylab("Number of Births per 1000 People")+
+        ylim(0,30)}
     else if(input$comparisonchoice=="Death Rate"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Death_Rate,color=Country))+
-        scale_color_manual(values=c("coral2", "cornflowerblue"))}
+        scale_color_manual(values=c("gold2", "slategray4"))+
+        xlim(1950, 2018)+
+        ylab("Number of Deaths per 1000 People")+
+        ylim(0,20)}
   })
   
 }
