@@ -6,6 +6,7 @@ library(leaflet)
 library(sf)
 library(rnaturalearth)
 library(RColorBrewer)
+library(rnaturalearthdata)
 
 test_df <- data.frame(
   Year = c("1989","2000"),
@@ -18,8 +19,8 @@ predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U
                           Birth_Count=c(50000,60000,70000,60000,70000,80000,70000,80000,90000,50000,50000,50000,50000,50000,50000),
                           Death_Count=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
                           Pop_Count=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
-                          Birth_Rate=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
-                          Death_Rate=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000)
+                          Birth_Rate=c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5),
+                          Death_Rate=c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5)
 )
 Rates <- read_csv("Rates.csv", col_types = cols(...1 = col_skip()))
 Rates$Year <- as.integer(Rates$Year)
@@ -273,17 +274,20 @@ server <- function(input, output) {
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Pop_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
-        geom_line(data=predicttest,aes(x=Year,y=Pop_Count,color=Type),linetype="dotted")}
+        geom_line(data=predicttest,aes(x=Year,y=Pop_Count,color=Type),linetype="dotted")+
+        ylab("Population")}
     else if(input$longchoice=="Birth Rate"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Birth_Rate,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
-        geom_line(data=predicttest,aes(x=Year,y=Birth_Rate,color=Type),linetype="dotted")}
+        geom_line(data=predicttest,aes(x=Year,y=Birth_Rate,color=Type),linetype="dotted")+
+        ylab("Number of Births per 1000 People")}
     else if(input$longchoice=="Death Rate"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Death_Rate,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
-        geom_line(data=predicttest,aes(x=Year,y=Death_Rate,color=Type),linetype="dotted")}
+        geom_line(data=predicttest,aes(x=Year,y=Death_Rate,color=Type),linetype="dotted")+
+        ylab("Number of Deaths per 1000 People")}
   })
   
   output$comparisonplot <- renderPlot({
