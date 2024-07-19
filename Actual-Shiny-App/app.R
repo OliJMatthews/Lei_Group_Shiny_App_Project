@@ -14,6 +14,7 @@ test_df <- data.frame(
 )
 Rates <- read_csv("Rates.csv", col_types = cols(...1 = col_skip()))
 Rates$Year <- as.integer(Rates$Year)
+Shiny_App_Descriptions <- read_csv("Shiny App Descriptions.csv")
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
              "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
              "Netherlands","New Zealand","Norway","Portugal",
@@ -73,8 +74,10 @@ country_search <- function(CountryNameA,CountryNameB){
               "Deaths" = Deaths))
 }
 description <- function(df,year,country){
-  a <- filter(df,Year==year & Country==country)
-  return(a$Description)
+  a <- df %>% 
+    filter(Year==year) %>% 
+    filter(Countries==country)
+  return(a$Descriptions)
 }
 get_age_pyramid_data <- function(countryCode){
   data <-readHMDweb(countryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
@@ -153,19 +156,6 @@ getCountryCode <- function(countryName){
     return(Codes[countryIndex])
   }
 }
-OlisPopSim <- function(populationsize,birthprob,deathprob){
-  birthcount <- 0
-  deathcount <- 0
-  for(i in 1:populationsize){
-    udeath <- runif(1,0,1)
-    if(udeath<deathprob){deathcount <- deathcount+1}
-    ubirth <- runif(1,0,1)
-    if(ubirth<birthprob){birthcount <- birthcount+1}
-  }
-  newpopulationsize <- populationsize+birthcount-deathcount
-  return(list("Pop"=newpopulationsize,"Births"=birthcount,"Deaths"=deathcount))
-}
-
 
 # Define UI for application that draws a histogram
 ui <- page_navbar(
@@ -251,9 +241,7 @@ server <- function(input, output) {
   output$description <- renderText({req(input$map_shape_click)
     click <- input$map_shape_click
     country_name <- click$id
-    description(test_df,input$year,country_name)})
-  
-  observeEvent(input$generatepop, output$popsim <- renderText(OlisPopSim(input$popsize,input$birthprob,input$deathprob)$Pop))
+    description(Shiny_App_Descriptions,input$year,country_name)})
   
   output$createlongplot <- renderPlot({
     req(input$map_shape_click)
