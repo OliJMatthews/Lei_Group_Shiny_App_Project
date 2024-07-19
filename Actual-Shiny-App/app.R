@@ -12,6 +12,15 @@ test_df <- data.frame(
   Country = c("Taiwan","U.K."),
   Description = c("TestA","TestB")
 )
+predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K."),
+                          Year=c(2019,2019,2019,2020,2020,2020,2021,2021,2021,2022,2022,2022,2023,2023,2023),
+                          Type=c("Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total"),
+                          Birth_Count=c(50000,60000,70000,60000,70000,80000,70000,80000,90000,50000,50000,50000,50000,50000,50000),
+                          Death_Count=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
+                          Pop_Count=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
+                          Birth_Rate=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
+                          Death_Rate=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000)
+)
 Rates <- read_csv("Rates.csv", col_types = cols(...1 = col_skip()))
 Rates$Year <- as.integer(Rates$Year)
 Shiny_App_Descriptions <- read_csv("Shiny App Descriptions.csv")
@@ -245,66 +254,70 @@ server <- function(input, output) {
     req(input$map_shape_click)
     click <- input$map_shape_click
     country_name <- click$id
-    ratesadjusted <- filter(Rates,Country==country_name) 
+    ratesadjusted <- filter(Rates,Country==country_name) %>% 
+      filter(Year>=1950) %>% 
+      filter(Year<=2018)
     if(input$longchoice=="Births"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Birth_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
-        ylab("Number of Births")}
+        ylab("Number of Births")+
+        geom_line(data=predicttest,aes(x=Year,y=Birth_Count,color=Type),linetype="dotted")}
     else if(input$longchoice=="Deaths"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Death_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
-        ylab("Number of Deaths")}
+        ylab("Number of Deaths")+
+        geom_line(data=predicttest,aes(x=Year,y=Death_Count,color=Type),linetype="dotted")}
     else if(input$longchoice=="Population"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Pop_Count,color=Type))+
-        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
+        geom_line(data=predicttest,aes(x=Year,y=Pop_Count,color=Type),linetype="dotted")}
     else if(input$longchoice=="Birth Rate"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Birth_Rate,color=Type))+
-        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
+        geom_line(data=predicttest,aes(x=Year,y=Birth_Rate,color=Type),linetype="dotted")}
     else if(input$longchoice=="Death Rate"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Death_Rate,color=Type))+
-        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
+        geom_line(data=predicttest,aes(x=Year,y=Death_Rate,color=Type),linetype="dotted")}
   })
   
   output$comparisonplot <- renderPlot({
     req(input$countrycomp)
     ratescomp <- Rates %>% 
       filter(Country==input$countrycomp) %>% 
-      filter(Type=="Total")
+      filter(Type=="Total") %>% 
+      filter(Year>=1950) %>% 
+      filter(Year<=2018)
     if(input$comparisonchoice=="Births"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Birth_Count,color=Country))+
         scale_color_manual(values=c("gold2", "slategray4"))+
-        xlim(1950, 2018)+
         ylab("Number of Births")}
     else if(input$comparisonchoice=="Deaths"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Death_Count,color=Country))+
         scale_color_manual(values=c("gold2", "slategray4"))+
-        xlim(1950, 2018)+
         ylab("Number of Deaths")}
     else if(input$comparisonchoice=="Population"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Pop_Count,color=Country))+
         scale_color_manual(values=c("gold2", "slategray4"))+
-        xlim(1950, 2018)+
         ylab("Population Size")}
     else if(input$comparisonchoice=="Birth Rate"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Birth_Rate,color=Country))+
         scale_color_manual(values=c("gold2", "slategray4"))+
-        xlim(1950, 2018)+
         ylab("Number of Births per 1000 People")+
         ylim(0,30)}
     else if(input$comparisonchoice=="Death Rate"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Death_Rate,color=Country))+
         scale_color_manual(values=c("gold2", "slategray4"))+
-        xlim(1950, 2018)+
         ylab("Number of Deaths per 1000 People")+
         ylim(0,20)}
   })
