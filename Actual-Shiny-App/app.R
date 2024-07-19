@@ -185,14 +185,14 @@ ui <- page_navbar(
                 ))),
   nav_panel(title = "Interactive Map",
             p(fluidRow(
-              column(6,leafletOutput("map")),
+              column(6,textOutput("prompttext"),
+                     leafletOutput("map")),
               column(6,radioButtons("longchoice","",choices = c("Births","Deaths","Population","Birth Rate","Death Rate")),
                      plotOutput("createlongplot"))),
               sliderInput("year","Year:",value=2000,min=1950,max=2018,step=1,sep="",width="100%"),
               textOutput("country_name"),),
             fluidRow(
-              column(6,plotOutput("pyramid"),
-                     textOutput("prompttext")),
+              column(6,plotOutput("pyramid")),
               column(6,textOutput("description"))),),
   nav_panel(title = "Comparison", 
             p(sidebarLayout(
