@@ -262,7 +262,24 @@ server <- function(input, output) {
       ratesadjusted <- filter(Rates,Country==country_name) 
       if(input$longchoice=="Births"){
       ggplot(ratesadjusted)+
-        geom_line(aes(x=Year,y=c(Male_Births,Female_Births,Total_Births)))}
+        geom_line(aes(x=Year,y=Birth_Count,color=Type))+
+           scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+      else if(input$longchoice=="Deaths"){
+        ggplot(ratesadjusted)+
+          geom_line(aes(x=Year,y=Death_Count,color=Type))+
+          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+      else if(input$longchoice=="Population"){
+        ggplot(ratesadjusted)+
+          geom_line(aes(x=Year,y=Pop_Count,color=Type))+
+          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+      else if(input$longchoice=="Birth Rate"){
+        ggplot(ratesadjusted)+
+          geom_line(aes(x=Year,y=Birth_Rate,color=Type))+
+          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
+      else if(input$longchoice=="Death Rate"){
+        ggplot(ratesadjusted)+
+          geom_line(aes(x=Year,y=Death_Rate,color=Type))+
+          scale_color_manual(values=c("coral2", "cornflowerblue", "black"))}
       })
 
   
