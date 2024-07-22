@@ -292,36 +292,32 @@ server <- function(input, output) {
   
   output$comparisonplot <- renderPlot({
     req(input$countrycomp)
+    country <- input$countrycomp
     ratescomp <- Rates %>% 
-      filter(Country==input$countrycomp) %>% 
+      filter(Country %in% country) %>% 
       filter(Type=="Total") %>% 
       filter(Year>=1950) %>% 
       filter(Year<=2018)
     if(input$comparisonchoice=="Births"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Birth_Count,color=Country))+
-        scale_color_manual(values=c("gold2", "slategray4"))+
         ylab("Number of Births")}
     else if(input$comparisonchoice=="Deaths"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Death_Count,color=Country))+
-        scale_color_manual(values=c("gold2", "slategray4"))+
         ylab("Number of Deaths")}
     else if(input$comparisonchoice=="Population"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Pop_Count,color=Country))+
-        scale_color_manual(values=c("gold2", "slategray4"))+
         ylab("Population Size")}
     else if(input$comparisonchoice=="Birth Rate"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Birth_Rate,color=Country))+
-        scale_color_manual(values=c("gold2", "slategray4"))+
         ylab("Number of Births per 1000 People")+
         ylim(0,30)}
     else if(input$comparisonchoice=="Death Rate"){
       ggplot(ratescomp)+
         geom_line(aes(x=Year,y=Death_Rate,color=Country))+
-        scale_color_manual(values=c("gold2", "slategray4"))+
         ylab("Number of Deaths per 1000 People")+
         ylim(0,20)}
   })
