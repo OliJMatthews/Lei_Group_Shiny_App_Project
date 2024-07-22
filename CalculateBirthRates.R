@@ -1,6 +1,7 @@
 library(HMDHFDplus)
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 getCountryCode <- function(countryName){
   Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
                  "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
@@ -57,15 +58,23 @@ calculateRates <- function(CountryName){
     pivot_longer(cols = - c(Year,Country),names_to = "Type",values_to = "Pop_Count")
 
   combinedDF <- inner_join(birthsDF,deathsDF,by=c("Year","Country","Type")) %>%
-    inner_join(popDF,by=c("Year","Country","Type"))
-
+    inner_join(popDF,by=c("Year","Country","Type")) %>%
+    group_by(Year,Country,Type) %>%
+    summarise(
+      Type,
+      Birth_Count,
+      Death_Count,
+      Pop_Count,
+      Birth_Rate = Birth_Count / Pop_Count * 1000 , 
+      Death_Rate = Death_Count / Pop_Count * 1000 
+    )
   return(combinedDF)
 }
-
-
-
-Rates <-calculateRates("Sweden")
+Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
+               "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
+               "Netherlands","New Zealand","Norway","Portugal",
+               "Slovakia","Spain","Sweden","Switzerland","U.K.","U.S.A.")
 
 Rates <- reduce(lapply(Countries,calculateRates),rbind)
-Rates <- data.frame(data) %>% relocate(Country)
+Rates <- data.frame(Rates) %>% relocate(Country)
 write.csv(Rates,"Rates.csv")
