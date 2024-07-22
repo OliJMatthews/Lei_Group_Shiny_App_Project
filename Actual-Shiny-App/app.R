@@ -258,31 +258,46 @@ server <- function(input, output) {
         geom_line(aes(x=Year,y=Birth_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
         ylab("Number of Births")+
-        geom_line(data=predicttest,aes(x=Year,y=Birth_Count,color=Type),linetype="dotted")}
+        geom_line(data=predicttest,aes(x=Year,y=Birth_Count,color=Type),linetype="dotted")+
+        ggtitle("Births over Time")+
+        theme_minimal()+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$longchoice=="Deaths"){
       ggplot(ratesadjusted)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Death_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
         ylab("Number of Deaths")+
-        geom_line(data=predicttest,aes(x=Year,y=Death_Count,color=Type),linetype="dotted")}
+        geom_line(data=predicttest,aes(x=Year,y=Death_Count,color=Type),linetype="dotted")+
+        ggtitle("Deaths over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$longchoice=="Population"){
       ggplot(ratesadjusted)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Pop_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
         geom_line(data=predicttest,aes(x=Year,y=Pop_Count,color=Type),linetype="dotted")+
-        ylab("Population")}
+        ylab("Population")+
+        ggtitle("Population over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$longchoice=="Birth Rate"){
       ggplot(ratesadjusted)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Birth_Rate,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
         geom_line(data=predicttest,aes(x=Year,y=Birth_Rate,color=Type),linetype="dotted")+
-        ylab("Number of Births per 1000 People")}
+        ylab("Number of Births per 1000 People")+
+        ggtitle("Birth Rate over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$longchoice=="Death Rate"){
       ggplot(ratesadjusted)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Death_Rate,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
         geom_line(data=predicttest,aes(x=Year,y=Death_Rate,color=Type),linetype="dotted")+
-        ylab("Number of Deaths per 1000 People")}
+        ylab("Number of Deaths per 1000 People")+
+        ggtitle("Death Rate over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
   })
   
   output$comparisonplot <- renderPlot({
@@ -295,26 +310,41 @@ server <- function(input, output) {
       filter(Year<=2018)
     if(input$comparisonchoice=="Births"){
       ggplot(ratescomp)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Birth_Count,color=Country))+
-        ylab("Number of Births")}
+        ylab("Number of Births")+
+        ggtitle("Births over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$comparisonchoice=="Deaths"){
       ggplot(ratescomp)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Death_Count,color=Country))+
-        ylab("Number of Deaths")}
+        ylab("Number of Deaths")+
+        ggtitle("Deaths over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$comparisonchoice=="Population"){
       ggplot(ratescomp)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Pop_Count,color=Country))+
-        ylab("Population Size")}
+        ylab("Population Size")+
+        ggtitle("Population over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$comparisonchoice=="Birth Rate"){
       ggplot(ratescomp)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Birth_Rate,color=Country))+
         ylab("Number of Births per 1000 People")+
-        ylim(0,30)}
+        ylim(0,30)+
+        ggtitle("Birth Rate over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
     else if(input$comparisonchoice=="Death Rate"){
       ggplot(ratescomp)+
+        theme_minimal()+
         geom_line(aes(x=Year,y=Death_Rate,color=Country))+
         ylab("Number of Deaths per 1000 People")+
-        ylim(0,20)}
+        ylim(0,20)+
+        ggtitle("Death Rate over Time")+
+        theme(plot.title = element_text(hjust = 0.5))}
   })
   
 }
