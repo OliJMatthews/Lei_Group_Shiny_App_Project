@@ -24,7 +24,6 @@ predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U
 )
 Rates <- read_csv("Rates.csv", col_types = cols(...1 = col_skip()))
 Rates$Year <- as.integer(Rates$Year)
-Shiny_App_Descriptions <- read_csv("Shiny App Descriptions.csv")
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
              "Finland","France","Hungary","Iceland","Ireland","Italy","Japan",
              "Netherlands","New Zealand","Norway","Portugal",
@@ -189,11 +188,10 @@ ui <- page_navbar(
                            leafletOutput("map"),
                            radioButtons("longchoice","",choices = c("Births","Deaths","Population","Birth Rate","Death Rate")),
                            textOutput("country_name")
-                           ),
+              ),
               mainPanel(plotOutput("createlongplot"),
                         sliderInput("year","Year:",value=2000,min=1950,max=2018,step=1,sep="",width="100%"),
-                        plotOutput("pyramid"),
-                        textOutput("description"))
+                        plotOutput("pyramid"))
             ))),
   nav_panel(title = "Comparison", 
             p(sidebarLayout(
@@ -247,10 +245,6 @@ server <- function(input, output) {
   output$prompttext <- renderText({req(!isTruthy(input$map_shape_click))
     return("Please Click on a Country")})
   
-  output$description <- renderText({req(input$map_shape_click)
-    click <- input$map_shape_click
-    country_name <- click$id
-    description(Shiny_App_Descriptions,input$year,country_name)})
   
   output$createlongplot <- renderPlot({
     req(input$map_shape_click)
