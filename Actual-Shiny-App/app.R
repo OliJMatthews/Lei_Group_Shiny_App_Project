@@ -183,21 +183,22 @@ ui <- page_navbar(
                 p("HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). 
                        Available ", a(href = "https://www.mortality.org","here"), str_glue("(data downloaded on {date}).", date = Sys.Date())
                 ))),
-  nav_panel(title = "Interactive Map",
+  nav_panel(title="Interactive Map",
             p(fluidRow(
-              column(6,textOutput("prompttext"),
-                     leafletOutput("map")),
-              column(6,radioButtons("longchoice","",choices = c("Births","Deaths","Population","Birth Rate","Death Rate")),
-                     plotOutput("createlongplot"))),
-              sliderInput("year","Year:",value=2000,min=1950,max=2018,step=1,sep="",width="100%"),
-              textOutput("country_name"),),
-            fluidRow(
-              column(6,plotOutput("pyramid")),
-              column(6,textOutput("description"))),),
+              sidebarPanel(textOutput("prompttext"),
+                           leafletOutput("map"),
+                           radioButtons("longchoice","",choices = c("Births","Deaths","Population","Birth Rate","Death Rate")),
+                           textOutput("country_name")
+                           ),
+              mainPanel(plotOutput("createlongplot"),
+                        sliderInput("year","Year:",value=2000,min=1950,max=2018,step=1,sep="",width="100%"),
+                        plotOutput("pyramid"),
+                        textOutput("description"))
+            ))),
   nav_panel(title = "Comparison", 
             p(sidebarLayout(
               sidebarPanel(
-                selectInput("countrycomp","Pick two countries to compare:",Country,multiple=TRUE),
+                selectInput("countrycomp","Pick Countries to Compare:",Country,multiple=TRUE),
                 radioButtons("comparisonchoice","",choices = c("Births","Deaths","Population","Birth Rate","Death Rate"))
               ),
               mainPanel(
