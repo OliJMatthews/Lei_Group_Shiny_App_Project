@@ -164,7 +164,7 @@ getCountryCode <- function(countryName){
 # Define UI for application that draws a histogram
 ui <- page_navbar(
   title = "Human Mortality Database",
-  bg = "#0062cc",
+  bg = "#00c5cd",
   underline = TRUE,
   nav_panel(title = "Welcome", 
             h1("Welcome to the welcome page"),
