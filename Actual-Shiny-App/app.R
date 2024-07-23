@@ -8,11 +8,6 @@ library(rnaturalearth)
 library(RColorBrewer)
 library(rnaturalearthdata)
 
-test_df <- data.frame(
-  Year = c("1989","2000"),
-  Country = c("Taiwan","U.K."),
-  Description = c("TestA","TestB")
-)
 predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K."),
                           Year=c(2019,2019,2019,2020,2020,2020,2021,2021,2021,2022,2022,2022,2023,2023,2023),
                           Type=c("Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total"),
@@ -203,7 +198,9 @@ ui <- page_navbar(
                 plotOutput("comparisonplot")
               )
             ))
-  ))
+  ),
+  nav_panel(title="Case Study: U.K. vs Japan")
+  )
 
 
 server <- function(input, output) {
