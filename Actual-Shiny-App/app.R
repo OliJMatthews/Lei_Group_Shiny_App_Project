@@ -175,7 +175,7 @@ ui <- page_navbar(
             ),
             div(style = "position: absolute; bottom:0;",
                 p("HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). 
-                       Available ", a(href = "https://www.mortality.org","here"), str_glue("(data downloaded on {date}).", date = Sys.Date())
+                       Available ", a(href = "https://www.mortality.org","here"), str_glue("(data downloaded on 23/07/2024).")
                 ))),
   nav_panel(title="Interactive Map",
             p(fluidRow(
