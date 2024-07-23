@@ -8,7 +8,7 @@ getCountryCode <- function(countryName){
                  "Netherlands","New Zealand","Norway","Portugal",
                  "Slovakia","Spain","Sweden","Switzerland","U.K.","U.S.A.")
   Codes <- c("AUS","AUT","BLR","BEL","BGR","CAN","CHL","CZE", "DNK",  "FIN","FRATNP",  "HUN",
-             "ISL", "IRL",  "ITA","JPN","NLD","NZL_NP","NOR","PRT","SVK","ESP",
+             "ISL", "IRL","ITA","JPN","NLD","NZL_NP","NOR","PRT","SVK","ESP",
              "SWE","CHE","GBR_NP","USA")
   
   countryIndex <- which(Countries == countryName)
@@ -65,9 +65,11 @@ calculateRates <- function(CountryName){
       Birth_Count,
       Death_Count,
       Pop_Count,
-      Birth_Rate = Birth_Count / Pop_Count * 1000 , 
-      Death_Rate = Death_Count / Pop_Count * 1000 
-    )
+      Death_Rate = Death_Count / Pop_Count * 1000,
+    ) %>%
+    ungroup() %>%
+    group_by(Year,Country) %>%
+    mutate(Birth_Rate = Birth_Count / sum(Pop_Count) * 1000)
   return(combinedDF)
 }
 Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
@@ -77,4 +79,6 @@ Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Ch
 
 Rates <- reduce(lapply(Countries,calculateRates),rbind)
 Rates <- data.frame(Rates) %>% relocate(Country)
-write.csv(Rates,"Rates.csv")
+write.csv(Rates,"~/Lei_Group_Shiny_App_Project/Rates.csv")
+
+
