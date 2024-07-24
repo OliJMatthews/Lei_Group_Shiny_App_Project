@@ -19,7 +19,7 @@ data <- Rates %>%
 ################################################################################
 
 # Birth rate model 
-birth_rate_model_gamma <- glm(formula = Birth_Count ~ I(Year-min(Year)) + Country + Type + offset(log(Pop_Count)),
+birth_rate_model_gamma <- glm(formula = Birth_Count ~ Year + Country + Type + offset(log(Pop_Count)),
                         data = data,
                         family = Gamma(link="log")) 
 summary(birth_rate_model_gamma)
@@ -33,7 +33,7 @@ exp(coef(birth_rate_model_gamma))
 # CountrySlovakia        CountrySpain       CountrySweden  CountrySwitzerland         CountryU.K.       CountryU.S.A.            TypeMale 
 # 1.01311665          0.98169073          0.73652575          0.84288139          0.85009895          1.03486107          1.09888826 
 
-birth_rate_model_poisson <- glm(formula = Birth_Count ~ I(Year-min(Year)) + Country + Type + offset(log(Pop_Count)),
+birth_rate_model_poisson <- glm(formula = Birth_Count ~ Year + Country + Type + offset(log(Pop_Count)),
                               data = data,
                               family = poisson(link="log")) 
 summary(birth_rate_model_poisson)
@@ -49,7 +49,7 @@ exp(coef(birth_rate_model_poisson))
 
 # Try also using a Poisson model but with robust standard errors
 
-birth_rate_model_nb <- glm.nb(formula = Birth_Count ~ I(Year-min(Year)) + Country + Type + offset(log(Pop_Count)),
+birth_rate_model_nb <- glm.nb(formula = Birth_Count ~ Year + Country + Type + offset(log(Pop_Count)),
                                 data = data, link=log) 
 summary(birth_rate_model_nb)
 exp(coef(birth_rate_model_nb))
@@ -123,7 +123,7 @@ with(predicted[predicted$Country=="Sweden" & predicted$Type=="Male",], points(Ye
 # Can also choose the knot locations and place these around the points where the rates change a lot
 
 # Can also include interactions
-birth_rate_model_poisson_splines_interactions <- glm(formula = Birth_Count ~ splines::ns(Year,df=8) + Country*Type + offset(log(Pop_Count)),
+birth_rate_model_poisson_splines_interactions <- glm(formula = Birth_Count ~ splines::ns(Year,df=20) + Country*Type + offset(log(Pop_Count)),
                                         data = data,
                                         family = poisson(link="log")) 
 summary(birth_rate_model_poisson_splines_interactions)
@@ -148,3 +148,4 @@ with(predicted[predicted$Country=="Australia" & predicted$Type=="Male",], points
 # The mortality rate may look to increase but this could just be because the population is getting older
 # and the age-specific mortality rates may actually remain the same or decrease
 # Could use the age-specific deaths and population sizes and then also include age in the model
+
