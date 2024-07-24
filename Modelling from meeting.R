@@ -6,14 +6,15 @@ library(MASS)
 library(splines)
 
 # Import and filter out deaths across Males and Females combined.
-Rates <- read_csv('Z:/Supervision/Interns/Rates2.csv',col_types = cols(...1 = col_skip()))
+Rates <- read_csv("Actual-Shiny-App/Rates.csv",col_types = cols(...1 = col_skip()))
 data <- Rates %>%
   filter(Type != "Total") %>%
   mutate(Type = factor(Type)) %>%
   mutate(Country = factor(Country)) %>%
   mutate(Death_Count = round(Death_Count)) %>%
   mutate(Pop_Count = round(Pop_Count)) %>%
-  filter(Year < 2019)
+  filter(Year < 2019) %>% 
+  filter(Year > 1949)
 
 ################################################################################
 

@@ -69,7 +69,7 @@ calculateRates <- function(CountryName){
     ) %>%
     ungroup() %>%
     group_by(Year,Country) %>%
-    mutate(Birth_Rate = Birth_Count / sum(Pop_Count) * 1000)
+    mutate(Birth_Rate = Birth_Count / sum(Pop_Count) * 1000 * 2)
   return(combinedDF)
 }
 Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
@@ -79,6 +79,6 @@ Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Ch
 
 Rates <- reduce(lapply(Countries,calculateRates),rbind)
 Rates <- data.frame(Rates) %>% relocate(Country)
-write.csv(Rates,"~/Lei_Group_Shiny_App_Project/Rates.csv")
+write.csv(Rates,"Actual-Shiny-App/Rates.csv")
 
 
