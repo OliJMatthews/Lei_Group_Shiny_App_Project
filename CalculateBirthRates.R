@@ -69,7 +69,7 @@ calculateRates <- function(CountryName){
     ) %>%
     ungroup() %>%
     group_by(Year,Country) %>%
-    mutate(Birth_Rate = Birth_Count / sum(Pop_Count) * 1000)
+    mutate(Birth_Rate = Birth_Count / sum(Pop_Count) * 1000 * 2)
   return(combinedDF)
 }
 Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
@@ -81,4 +81,60 @@ Rates <- reduce(lapply(Countries,calculateRates),rbind)
 Rates <- data.frame(Rates) %>% relocate(Country)
 write.csv(Rates,"~/Lei_Group_Shiny_App_Project/Rates.csv")
 
+standardisedDR <- function(CountryName){
+  CountryCode <- getCountryCode(CountryName)
+  deathsDF <- readHMDweb(CountryCode,"Deaths_1x1","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+    mutate(Age_Group = cut(Age,c(seq(0,100,by=5),Inf),inlude.lowest = TRUE, right = FALSE))
+  
+  age_dist <- data.frame(
+    Age_Group = levels(deathsDF$Age_Group),
+    Perc = c(8.860,8.690,8.600,8.470,8.220,7.930,7.610,7.150,6.590,6.040,5.370,
+             4.550,3.720,2.960,2.210,1.520,0.910,0.440,0.150,0.040,0.005) / 100
+  )
+  
+  deathsDF <- deathsDF %>% 
+    left_join(age_dist, by = "Age_Group") %>%
+    group_by(Year,Age_Group) %>%
+    reframe(
+      Year,
+      Age_Group,
+      Perc,
+      Deaths = sum(Total)
+    ) 
+  
+  popDF <- readHMDweb(CountryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
+    mutate(Age_Group = cut(Age,c(seq(0,100,by=5),Inf),inlude.lowest = TRUE, right = FALSE)) %>%
+    select(Year,Age_Group,Total2) %>%
+    group_by(Year,Age_Group) %>%
+    reframe(
+      Year,
+      Age_Group,
+      Pop_Total = sum(Total2)
+    ) %>%
+    unique()
+  
+  deathsDF <- deathsDF %>%
+    inner_join(popDF, by = c("Age_Group","Year")) %>%
+    unique() %>%
+    group_by(Year) %>%
+    reframe(
+      Year,
+      Age_Group,
+      Deaths,
+      Death_Rate = Deaths / Pop_Total*1000,
+      Perc
+    ) %>%
+    group_by(Year) %>%
+    reframe(
+      Year,
+      Std_Death_Rate = sum(Death_Rate * Perc)
+    ) %>%
+    unique() %>%
+    mutate( Country = CountryName) %>% 
+    relocate(Country)
 
+return(deathsDF)
+}
+
+Rates <- reduce(lapply(Countries,standardisedDR),rbind)
+write.csv(Rates,"~/Lei_Group_Shiny_App_Project/Std_Death_Rate.csv")
