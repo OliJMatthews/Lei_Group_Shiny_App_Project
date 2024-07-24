@@ -69,7 +69,7 @@ calculateRates <- function(CountryName){
     ) %>%
     ungroup() %>%
     group_by(Year,Country) %>%
-    mutate(Birth_Rate = Birth_Count / sum(Pop_Count) * 1000 * 2)
+    mutate(Birth_Rate = Birth_Count / (sum(Pop_Count)/2) * 1000)
   return(combinedDF)
 }
 Countries <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
