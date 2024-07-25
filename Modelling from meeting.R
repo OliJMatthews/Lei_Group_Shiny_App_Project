@@ -32,6 +32,7 @@ summary(birth_rate_model_gamma)
 # CountrySlovakia        CountrySpain       CountrySweden  CountrySwitzerland         CountryU.K.       CountryU.S.A.            TypeMale 
 # 1.01311665          0.98169073          0.73652575          0.84288139          0.85009895          1.03486107          1.09888826 
 
+ 
 birth_rate_model_poisson <- glm(formula = Birth_Count ~ Year + Country + offset(log(Pop_Count)),
                               data = birth_data,
                               family = poisson(link="log")) 
@@ -128,7 +129,7 @@ with(predicted[predicted$Country=="Sweden",], points(Year,log(Birth_Rate),col="b
 # Can also include interactions
 birth_rate_model_poisson_splines_interactions <- glm(formula = Birth_Count ~ splines::ns(Year,df=15) + Country + offset(log(Pop_Count)),
                                         data = data,
-                                        family = poisson(link="log")) 
+                                        family = poisson(link="log"))
 summary(birth_rate_model_poisson_splines_interactions)
 
 predicted$Predicted_Birth_Rate_Splines_Interactions<-predict(birth_rate_model_poisson_splines_interactions,predicted,type = "response")
@@ -233,3 +234,4 @@ write.csv(final_birth_rate_predictions,"~/Lei_Group_Shiny_App_Project/Birth_Rate
 
 final_death_rate_predictions <- expand.grid(Country = Countries,Age = 0:110,Year = 2018:2030 - 1949,Pop_Count = 1000)
 final_birth_rate_predictions$Predicted_Death_Rate <- predict(birth_rate_model_poisson_splines,newdata = final_birth_rate_predictions) 
+

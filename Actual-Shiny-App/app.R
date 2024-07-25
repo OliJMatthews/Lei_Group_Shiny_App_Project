@@ -5,7 +5,6 @@ library(HMDHFDplus)
 library(leaflet)
 library(sf)
 library(rnaturalearth)
-library(RColorBrewer)
 library(rnaturalearthdata)
 
 predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K."),
@@ -255,7 +254,6 @@ server <- function(input, output) {
         geom_line(aes(x=Year,y=Birth_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
         ylab("Number of Births")+
-        geom_line(data=predicttest,aes(x=Year,y=Birth_Count,color=Type),linetype="dotted")+
         ggtitle("Births over Time")+
         theme_minimal()+
         theme(plot.title = element_text(hjust = 0.5))}
@@ -265,7 +263,6 @@ server <- function(input, output) {
         geom_line(aes(x=Year,y=Death_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
         ylab("Number of Deaths")+
-        geom_line(data=predicttest,aes(x=Year,y=Death_Count,color=Type),linetype="dotted")+
         ggtitle("Deaths over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
     else if(input$longchoice=="Population"){
@@ -273,15 +270,14 @@ server <- function(input, output) {
         theme_minimal()+
         geom_line(aes(x=Year,y=Pop_Count,color=Type))+
         scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
-        geom_line(data=predicttest,aes(x=Year,y=Pop_Count,color=Type),linetype="dotted")+
         ylab("Population")+
         ggtitle("Population over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
     else if(input$longchoice=="Birth Rate"){
-      ggplot(ratesadjusted)+
+      dataadj <- filter(ratesadjusted,Type=="Total")
+      ggplot(dataadj)+
         theme_minimal()+
-        geom_line(aes(x=Year,y=Birth_Rate,color=Type))+
-        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
+        geom_line(aes(x=Year,y=Birth_Rate))+
         geom_line(data=predicttest,aes(x=Year,y=Birth_Rate,color=Type),linetype="dotted")+
         ylab("Number of Births per 1000 People")+
         ggtitle("Birth Rate over Time")+
