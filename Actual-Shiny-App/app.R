@@ -16,6 +16,8 @@ predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U
                           Birth_Rate=c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5),
                           Death_Rate=c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5)
 )
+Birth_Rate_Predictions <- read_csv("Birth_Rate_Predictions.csv", 
+                                   col_types = cols(...1 = col_skip(), Pop_Count = col_skip()))
 Rates <- read_csv("Rates.csv", col_types = cols(...1 = col_skip()))
 Rates$Year <- as.integer(Rates$Year)
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
@@ -252,6 +254,7 @@ server <- function(input, output) {
     ratesadjusted <- filter(Rates,Country==country_name) %>% 
       filter(Year>=1950) %>% 
       filter(Year<=2018)
+    Birth_Rate_Predictions <- filter(Birth_Rate_Predictions,Country==country_name)
     if(input$longchoice=="Births"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Birth_Count,color=Type))+
@@ -281,7 +284,7 @@ server <- function(input, output) {
       ggplot(dataadj)+
         theme_minimal()+
         geom_line(aes(x=Year,y=Birth_Rate))+
-        geom_line(data=predicttest,aes(x=Year,y=Birth_Rate,color=Type),linetype="dotted")+
+        geom_line(data=Birth_Rate_Predictions,aes(x=Year,y=Predicted_Birth_Rate),linetype="dotted")+
         ylab("Number of Births per 1000 People")+
         ggtitle("Birth Rate over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
