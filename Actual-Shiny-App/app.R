@@ -198,11 +198,13 @@ ui <- page_navbar(
               )
             ))
   ),
-  nav_panel(title="Case Study: U.K. vs Japan")
-  )
+  nav_panel(title="Case Study: U.K. vs Japan",
+            p(htmlOutput("inc")))
+)
 
 
 server <- function(input, output) {
+  
   data.sets <- reactive({
     input_valueA <- input$country[1]
     input_valueB <- input$country[2]
@@ -339,7 +341,7 @@ server <- function(input, output) {
         ggtitle("Death Rate over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
   })
-  
+  output$inc <- renderUI(includeHTML("eg.html"))
 }
 
 
