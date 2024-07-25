@@ -13,7 +13,7 @@ birth_data <- Rates %>%
   filter(Year < 2019) %>% 
   filter(Year > 1949) %>%
   mutate(Year = Year - min(Year)) %>%
-  select(-Type)
+  dplyr::select(-Type)
 
 ################################################################################
 
@@ -63,10 +63,10 @@ exp(coef(birth_rate_model_nb))
 # 1.01315324          0.98164706          0.73634254          0.84280851          0.85010116          1.03487584          1.09889034 
 
 # Predict for original dataset
-predicted<-birth_data[c("Country","Year","Type","Birth_Rate")]
+predicted<-birth_data[c("Country","Year","Birth_Rate")]
 predicted$Pop_Count<-1000
-# predicted$Predicted_Birth_Rate<-predict(birth_rate_model_poisson,predicted,type = "response")
-predicted$Predicted_Birth_Rate<-predict(birth_rate_model_gamma,predicted,type = "response")
+predicted$Predicted_Birth_Rate<-predict(birth_rate_model_poisson,predicted,type = "response")
+#predicted$Predicted_Birth_Rate<-predict(birth_rate_model_gamma,predicted,type = "response")
 #predicted$Predicted_Birth_Rate<-predict(birth_rate_model_nb,predicted,type = "response")
 
 # Check agreement
@@ -107,6 +107,8 @@ with(predicted[predicted$Country=="Sweden",], plot(Year,log(Predicted_Birth_Rate
 with(predicted[predicted$Country=="Sweden",], points(Year,log(Birth_Rate),col="blue",pch=4))
 
 # Using splines
+predicted<-birth_data[c("Country","Year","Birth_Rate")]
+predicted$Pop_Count<-1000
 birth_rate_model_poisson_splines <- glm(formula = Birth_Count ~ splines::ns(Year,df=5) + Country + offset(log(Pop_Count)),
                                         data = data,
                                         family = poisson(link="log")) 
@@ -114,7 +116,7 @@ summary(birth_rate_model_poisson_splines)
 
 predicted$Predicted_Birth_Rate_Splines<-predict(birth_rate_model_poisson_splines,predicted,type = "response")
 
-with(predicted[predicted$Country=="Australia",], plot(Year,log(Predicted_Birth_Rate_Splines),col="red"))
+with(predicted[predicted$Country=="Australia",], plot(Year,log(Predicted_Birth_Rate_Splines),ylim=c(0,5),col="red"))
 with(predicted[predicted$Country=="Australia",], points(Year,log(Birth_Rate),col="blue",pch=4))
 
 with(predicted[predicted$Country=="U.K.",], plot(Year,log(Predicted_Birth_Rate_Splines),col="red"))
@@ -134,10 +136,8 @@ summary(birth_rate_model_poisson_splines_interactions)
 
 predicted$Predicted_Birth_Rate_Splines_Interactions<-predict(birth_rate_model_poisson_splines_interactions,predicted,type = "response")
 
-with(predicted[predicted$Country=="Australia" & predicted$Type=="Female",], plot(Year,log(Predicted_Birth_Rate_Splines_Interactions),col="red"))
-with(predicted[predicted$Country=="Australia" & predicted$Type=="Male",], points(Year,log(Predicted_Birth_Rate_Splines_Interactions),col="blue"))
-with(predicted[predicted$Country=="Australia" & predicted$Type=="Female",], points(Year,log(Birth_Rate),col="red",pch=4))
-with(predicted[predicted$Country=="Australia" & predicted$Type=="Male",], points(Year,log(Birth_Rate),col="blue",pch=4))
+with(predicted[predicted$Country=="Australia" ,], plot(Year,log(Predicted_Birth_Rate_Splines_Interactions),col="red"))
+with(predicted[predicted$Country=="Australia",], points(Year,log(Birth_Rate),col="blue",pch=4))
 
 # Compared to no interactions
 with(predicted[predicted$Country=="Australia" & predicted$Type=="Female",], plot(Year,log(Predicted_Birth_Rate_Splines),col="red"))
@@ -183,7 +183,11 @@ deaths_data <- deaths_data %>%
   filter(Year > 1949) %>%
   filter(Year < 2019) %>%
   mutate(Year = (Year - 1949)) %>%
-  mutate(Sex = factor(Sex))
+  mutate(Sex = factor(Sex)) %>%
+  mutate(Death_Count = ceiling(Death_Count)) %>%
+  mutate(Age_Group = cut(Age,c(seq(0,100,by=5),Inf),inlude.lowest = TRUE, right = FALSE)) %>%
+  group_by(Country,Year,Sex,Age_Group) %>% 
+  mutate(Grouped_Death_Count = sum(Death_Count),Grouped_Pop_Count = sum(Pop_Count))
 
 death_rate_model_gamma <- glm(formula = Death_Count ~ Sex + Year + Country + offset(log(Pop_Count)),
                               data = deaths_data,
@@ -215,23 +219,53 @@ with(predicted[predicted$Country=="Australia" & predicted$Age==0 & predicted$Sex
 with(predicted[predicted$Country=="Australia" & predicted$Age==0 & predicted$Sex=="Male",], points(Year,log(Death_Rate),col="red",pch = 4))
 with(predicted[predicted$Country=="Australia" & predicted$Age==0 & predicted$Sex=="Female",], points(Year,log(Death_Rate),col="blue",pch = 4))
 
-death_rate_model_gamma <- glm(formula = Death_Count ~ Age*Year*Country + offset(log(Pop_Count)),
+death_rate_model_poisson <- glm(formula = Death_Count ~ Age*Year*Country + offset(log(Pop_Count)),
                               data = deaths_data,
-                              family = Gamma(link="log")) 
+                              family = poisson(link="log")) 
 summary(death_rate_model_gamma)
 exp(coef(death_rate_model_gamma))
 
 summary(death_rate_model_gamma)
 exp(coef(death_rate_model_gamma))
+
+predicted<-deaths_data[c("Country","Year","Age","Sex","Death_Count","Pop_Count")]
+predicted <- predicted %>%
+  mutate(Death_Rate = (Death_Count / Pop_Count * 1000)) %>%
+  mutate(Predicted_Death_Rate = predict(death_rate_model_poisson)) %>%
+  mutate(Pop_Count = 1000)
+
+death_rate_model_poisson <- glm(formula = Grouped_Death_Count ~ Age_Group*Year*Country + offset(log(Grouped_Pop_Count)),
+                                data = deaths_data,
+                                family = poisson(link="log")) 
+summary(death_rate_model_gamma)
+exp(coef(death_rate_model_gamma))
+
+summary(death_rate_model_gamma)
+exp(coef(death_rate_model_gamma))
+
+predicted<-deaths_data[c("Country","Year","Age","Sex","Death_Count","Pop_Count")]
+predicted <- predicted %>%
+  mutate(Death_Rate = (Death_Count / Pop_Count * 1000)) %>%
+  mutate(Predicted_Death_Rate = predict(death_rate_model_poisson)) %>%
+  mutate(Pop_Count = 1000)
+
+
+with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Male",], plot(Year,log(Predicted_Death_Rate),ylim = c(-2,1.5),col="red"))
+with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Female",], points(Year,log(Predicted_Death_Rate),col="blue"))
+with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Male",], points(Year,log(Death_Rate),col="red",pch = 4))
+with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Female",], points(Year,log(Death_Rate),col="blue",pch = 4))
 
 ################################################################################
 final_birth_rate_predictions <- expand.grid(Country = Countries,Year = 2018:2030 - 1949,Pop_Count = 1000) 
-final_birth_rate_predictions$Predicted_Birth_Rate <- predict(birth_rate_model_poisson_splines,newdata = final_birth_rate_predictions) 
+final_birth_rate_predictions$Predicted_Birth_Rate <- predict(birth_rate_model_poisson_splines,newdata = final_birth_rate_predictions,type = "response") 
 final_birth_rate_predictions$Year <- final_birth_rate_predictions$Year + 1949
+
+
 
 write.csv(final_birth_rate_predictions,"~/Lei_Group_Shiny_App_Project/Birth_Rate_Predictions.csv")
 
 
 final_death_rate_predictions <- expand.grid(Country = Countries,Age = 0:110,Year = 2018:2030 - 1949,Pop_Count = 1000)
 final_birth_rate_predictions$Predicted_Death_Rate <- predict(birth_rate_model_poisson_splines,newdata = final_birth_rate_predictions) 
+
 
