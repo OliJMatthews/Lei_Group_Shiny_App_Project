@@ -13,7 +13,8 @@ birth_data <- Rates %>%
   filter(Year < 2019) %>% 
   filter(Year > 1949) %>%
   mutate(Year = Year - min(Year)) %>%
-  dplyr::select(-Type)
+  dplyr::select(-Type) %>%
+  mutate(Year = Year+1949)
 
 ################################################################################
 
@@ -90,8 +91,8 @@ with(predicted[predicted$Country=="Sweden",], points(Year,log(Birth_Rate),col="b
 # Consider modelling year as a non-linear term e.g. fractional polynomials, splines
 
 # Fit a more complex model - the effect of year is not linear
-birth_rate_model_poisson_complex <- glm(formula = Birth_Count ~ Year + I(Year^2) + Country +  offset(log(Pop_Count)),
-                                data = data,
+birth_rate_model_poisson_complex <- glm(formula = Birth_Count ~ Year + I(Year^3) + I(Year^2) + Country +  offset(log(Pop_Count)),
+                                data = birth_data,
                                 family = poisson(link="log")) 
 summary(birth_rate_model_poisson_complex)
 
@@ -109,14 +110,14 @@ with(predicted[predicted$Country=="Sweden",], points(Year,log(Birth_Rate),col="b
 # Using splines
 predicted<-birth_data[c("Country","Year","Birth_Rate")]
 predicted$Pop_Count<-1000
-birth_rate_model_poisson_splines <- glm(formula = Birth_Count ~ splines::ns(Year,df=5) + Country + offset(log(Pop_Count)),
-                                        data = data,
+birth_rate_model_poisson_splines <- glm(formula = Birth_Count ~ splines::ns(Year,df=15) + log(Year) +  Country + Year:Country + offset(log(Pop_Count)),
+                                        data = birth_data,
                                         family = poisson(link="log")) 
 summary(birth_rate_model_poisson_splines)
 
 predicted$Predicted_Birth_Rate_Splines<-predict(birth_rate_model_poisson_splines,predicted,type = "response")
 
-with(predicted[predicted$Country=="Australia",], plot(Year,log(Predicted_Birth_Rate_Splines),ylim=c(0,5),col="red"))
+with(predicted[predicted$Country=="Australia",], plot(Year,log(Predicted_Birth_Rate_Splines),col="red"))
 with(predicted[predicted$Country=="Australia",], points(Year,log(Birth_Rate),col="blue",pch=4))
 
 with(predicted[predicted$Country=="U.K.",], plot(Year,log(Predicted_Birth_Rate_Splines),col="red"))
@@ -129,8 +130,8 @@ with(predicted[predicted$Country=="Sweden",], points(Year,log(Birth_Rate),col="b
 # Can also choose the knot locations and place these around the points where the rates change a lot
 
 # Can also include interactions
-birth_rate_model_poisson_splines_interactions <- glm(formula = Birth_Count ~ splines::ns(Year,df=15) + Country + offset(log(Pop_Count)),
-                                        data = data,
+birth_rate_model_poisson_splines_interactions <- glm(formula = Birth_Count ~ splines::ns(Year,df=15) + Country*Year + offset(log(Pop_Count)),
+                                        data = birth_data,
                                         family = poisson(link="log"))
 summary(birth_rate_model_poisson_splines_interactions)
 
@@ -256,9 +257,12 @@ with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Se
 with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Female",], points(Year,log(Death_Rate),col="blue",pch = 4))
 
 ################################################################################
-final_birth_rate_predictions <- expand.grid(Country = Countries,Year = 2018:2030 - 1949,Pop_Count = 1000) 
-final_birth_rate_predictions$Predicted_Birth_Rate <- predict(birth_rate_model_poisson_splines,newdata = final_birth_rate_predictions,type = "response") 
-final_birth_rate_predictions$Year <- final_birth_rate_predictions$Year + 1949
+final_birth_rate_predictions <- expand.grid(Country = Countries,Year = 2018:2030,Pop_Count = 1000) 
+final_birth_rate_model <- glm(formula = Birth_Count ~ splines::ns(Year,df=15) + Country*Year + log(Year) + offset(log(Pop_Count)),
+                                                     data = birth_data,
+                                                     family = poisson(link="log"))
+final_birth_rate_predictions$Predicted_Birth_Rate <- predict(final_birth_rate_model,newdata = final_birth_rate_predictions,type = "response") 
+final_birth_rate_predictions$Year <- final_birth_rate_predictions$Year
 
 
 
