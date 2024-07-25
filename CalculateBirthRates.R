@@ -49,7 +49,7 @@ calculateRates <- function(CountryName){
 
   popDF <- readHMDweb(CountryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
     group_by(Year) %>%
-    select(Year,Female2,Male2,Total2) %>%
+    dplyr::select(Year,Female2,Male2,Total2) %>%
     group_by(Year) %>%
     summarise( Male = sum(Male2),
                Female = sum(Female2),
@@ -104,7 +104,7 @@ standardisedDR <- function(CountryName){
   
   popDF <- readHMDweb(CountryCode,"Population","om119@leicester.ac.uk","LeicesterShinyProject2024!") %>%
     mutate(Age_Group = cut(Age,c(seq(0,100,by=5),Inf),inlude.lowest = TRUE, right = FALSE)) %>%
-    select(Year,Age_Group,Total2) %>%
+    dplyr::select(Year,Age_Group,Total2) %>%
     group_by(Year,Age_Group) %>%
     reframe(
       Year,
