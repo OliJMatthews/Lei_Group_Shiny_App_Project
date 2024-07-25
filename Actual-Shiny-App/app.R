@@ -198,11 +198,14 @@ ui <- page_navbar(
               )
             ))
   ),
-  nav_panel(title="Case Study: U.K. vs Japan")
-  )
+  nav_panel(title="Case Study: U.K. vs Japan"
+          )
+)
 
 
 server <- function(input, output) {
+  output$inc <- renderUI(includeHTML("eg.html"))
+  
   data.sets <- reactive({
     input_valueA <- input$country[1]
     input_valueB <- input$country[2]
