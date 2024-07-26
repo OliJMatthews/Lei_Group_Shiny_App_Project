@@ -8,17 +8,12 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 
 
-predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K."),
-                          Year=c(2019,2019,2019,2020,2020,2020,2021,2021,2021,2022,2022,2022,2023,2023,2023),
-                          Type=c("Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total"),
-                          Birth_Count=c(50000,60000,70000,60000,70000,80000,70000,80000,90000,50000,50000,50000,50000,50000,50000),
-                          Death_Count=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
-                          Pop_Count=c(5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000),
-                          Birth_Rate=c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5),
-                          Death_Rate=c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5)
-)
 Birth_Rate_Predictions <- read_csv("Birth_Rate_Predictions.csv", 
                                    col_types = cols(...1 = col_skip(), Pop_Count = col_skip()))
+Death_Rate_Predictions <- read_csv("Death_Rate_Predictions.csv", 
+                                   col_types = cols(...1 = col_skip()))
+Deaths_Data <- read_csv("Deaths_Data.csv", 
+                        col_types = cols(...1 = col_skip()))
 Rates <- read_csv("Rates.csv", col_types = cols(...1 = col_skip()))
 Rates$Year <- as.integer(Rates$Year)
 Country <- c("Australia","Austria","Belarus","Belgium","Bulgaria","Canada","Chile","Czechia","Denmark",
@@ -165,21 +160,23 @@ getCountryCode <- function(countryName){
 
 # Define UI for application that draws a histogram
 ui <- page_navbar(
-  title = "Human Mortality Database",
+  title = "Global Population Visualisation",
   bg = "#00c5cd",
   underline = TRUE,
   nav_panel(title = "Welcome", 
-            h1("Welcome to the welcome page"),
-            h2("Functionality:"),
-            tags$ul(
-              tags$li("Hello World1"),
-              tags$li("Hello World2")
-            ),
+            h1("Welcome to the Global Population Visualisation Tool"),
+            p("On the interactive map you can click on a country, view key population growth measures and view a population pyramid at a specific point
+              in time by using the year slider."),
+            p("On the comparison tab you can view a longitudinal plot of these key population growth measures and compare as many countries as you want."),
+            p("Finally, we have studied a case study of these changes and population health consequences in the U.K. and Japan."),
             div(style = "position: absolute; bottom:0;",
                 p("HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, 
                 Berkeley (USA), and French Institute for Demographic Studies (France). 
                        Available ", a(href = "https://www.mortality.org","here"), str_glue("(data downloaded on 23/07/2024).")
-                ))),
+                ),
+                p("The Global Health Observatory. World Health Organisation (WHO). Available", 
+                  a(href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/gho-ghe-ncd-mortality-rate","here"),
+                  str_glue("(data downloaded on 26/07/2024).")))),
   nav_panel(title="Interactive Map",
             p(fluidRow(
               sidebarPanel(textOutput("prompttext"),
@@ -203,6 +200,8 @@ ui <- page_navbar(
             ))
   ),
   nav_panel(title="Case Study: U.K. vs Japan",
+            p(tags$b(tags$u("How global populations have evolved over time - Japan and UK as a case study to illustrate challenges of 
+                     population changes and how healthcare initiatives differ between them. "))),
             p("Economic prosperity gives rise to significant lifestyle changes, allowing for the prioritisation of careers and 
             education over family formation. Both the UK and Japan, as high-income countries have lower mortality and birth rates 
             due to factors such as increased educational and career opportunities for women, higher living costs and wide-spread 
@@ -291,11 +290,11 @@ ui <- page_navbar(
             p("The program focused on a range of issues including hypertension, smoking, excessive alcohol consumption, hyperlipidaemia which were outlined 
             through the use of epidemiological studies that highlighted the prevalence of stroke and these risk factors as a primary reason for NCD death."),
             p("An evaluation in 2018 assessed the progress and impact of Health Japan 21, some achievements included:",
-            tags$div(
-              tags$li("Decrease in health inequalities and overall health outcome improvement across different socio-economic groups "),
-              tags$li("Increased cancer screening participation"),
-              tags$li("Lower suicide rates "),
-              tags$li("Improved nutritional standards for corporations "))),
+              tags$div(
+                tags$li("Decrease in health inequalities and overall health outcome improvement across different socio-economic groups "),
+                tags$li("Increased cancer screening participation"),
+                tags$li("Lower suicide rates "),
+                tags$li("Improved nutritional standards for corporations "))),
             p(tags$u("Accessibility")),
             p("A key factor in Japan’s success in managing NCDs is how accessible its healthcare system is for low-income groups. Widespread 
               accessibility of ‘Check-up hospitals’, where students and employees are mandated to receive comprehensive health reports at no 
@@ -327,12 +326,13 @@ ui <- page_navbar(
             p("Lower socioeconomic groups are more likely to consume higher levels of alcohol. The psychological stress of deprivation can often lead to poor coping mechanisms 
               such as smoking, excessive alcohol consumption and comfort eating. Countries have seen significant increases in alcohol related mortality during times of economic 
               duress, this is pattern is seen on a microcosmic level in lower socioeconomic groups."),
-            p("Addressing these SDHs may be key to reducing deaths from NCDs.")
-            
-            
+            p("Addressing these SDHs may be key to reducing deaths from NCDs."),
+            p("In summary, Japan’s proactive and preventative approach to managing NCDs has resulted in one of the lowest NCD mortality rates despite its rapidly 
+              ageing population."),
+            p("The UK should draw from this successful health system and implement similar strategies to reduce the potential increase in NCD mortality as 
+              its population ages further. Measures such as increasing accessibility of routine health screenings for the middle-aged population to ensure 
+              early detection, integrating check-ups into daily living, and providing early support to those at risk can significantly enhance the UK’s current approach. ")
             )
-            
-            
 )
 
 
@@ -380,6 +380,8 @@ server <- function(input, output) {
       filter(Year>=1950) %>% 
       filter(Year<=2018)
     Birth_Rate_Predictions <- filter(Birth_Rate_Predictions,Country==country_name)
+    Death_Rate_Predictions <- filter(Death_Rate_Predictions,Country==country_name)
+    Deaths_Data <- filter(Deaths_Data,Country==country_name)
     if(input$longchoice=="Births"){
       ggplot(ratesadjusted)+
         geom_line(aes(x=Year,y=Birth_Count,color=Type))+
@@ -414,11 +416,10 @@ server <- function(input, output) {
         ggtitle("Birth Rate over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
     else if(input$longchoice=="Death Rate"){
-      ggplot(ratesadjusted)+
+      ggplot(Deaths_Data)+
         theme_minimal()+
-        geom_line(aes(x=Year,y=Death_Rate,color=Type))+
-        scale_color_manual(values=c("coral2", "cornflowerblue", "black"))+
-        geom_line(data=predicttest,aes(x=Year,y=Death_Rate,color=Type),linetype="dotted")+
+        geom_line(aes(x=Year,y=Death_Rate,color=Age_Group))+
+        geom_line(data=Death_Rate_Predictions,aes(x=Year,y=Predicted_Death_Rate,color=Age_Group),linetype="dotted")+
         ylab("Number of Deaths per 1000 People")+
         ggtitle("Death Rate over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
@@ -493,13 +494,13 @@ server <- function(input, output) {
                                                                   Value = col_skip(), FactValueTranslationID = col_skip(), 
                                                                   FactComments = col_skip(), Language = col_skip(), 
                                                                   DateModified = col_skip()))
-                                
-                                ggplot(NCD)+
-                                  geom_line(aes(x=Period,y=FactValueNumeric,color=SpatialDimValueCode))+
-                                  theme_minimal()+
-                                  labs(title = "NCD Mortality Rates over Time")+
-                                  xlab("Year")+
-                                  ylab("Non-Communicable Disease Rate")
+  
+  ggplot(NCD)+
+    geom_line(aes(x=Period,y=FactValueNumeric,color=SpatialDimValueCode))+
+    theme_minimal()+
+    labs(title = "NCD Mortality Rates over Time")+
+    xlab("Year")+
+    ylab("Non-Communicable Disease Rate")
   })
   
 }
