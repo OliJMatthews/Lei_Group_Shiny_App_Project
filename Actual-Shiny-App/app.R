@@ -176,7 +176,8 @@ ui <- page_navbar(
               tags$li("Hello World2")
             ),
             div(style = "position: absolute; bottom:0;",
-                p("HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). 
+                p("HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, 
+                Berkeley (USA), and French Institute for Demographic Studies (France). 
                        Available ", a(href = "https://www.mortality.org","here"), str_glue("(data downloaded on 23/07/2024).")
                 ))),
   nav_panel(title="Interactive Map",
@@ -202,7 +203,49 @@ ui <- page_navbar(
             ))
   ),
   nav_panel(title="Case Study: U.K. vs Japan",
-          "Economic prosperity gives rise to significant lifestyle changes, allowing for the prioritisation of careers and education over family formation. Both the UK and Japan, as high-income countries have lower mortality and birth rates due to factors such as increased educational and career opportunities for women, higher living costs and wide-spread access to healthcare and family planning. While these trends reflect advancements in socio-economic conditions and medical access, they are also indicative of the challenges of population ageing. ")
+          p("Economic prosperity gives rise to significant lifestyle changes, allowing for the prioritisation of careers and 
+            education over family formation. Both the UK and Japan, as high-income countries have lower mortality and birth rates 
+            due to factors such as increased educational and career opportunities for women, higher living costs and wide-spread 
+            access to healthcare and family planning. While these trends reflect advancements in socio-economic conditions and medical 
+            access, they are also indicative of the challenges of population ageing."),
+          p(tags$b("Japan") ,"has the highest proportion of elderly citizens in the world, with over 28% of its population aged 65 and older.
+            This demographic shift is due to Japan’s sub-replacement fertility rate and decreased mortality rates. Figure 1 provides a visual
+            representation of the age distribution across different gender groups in Japan. "),
+          fluidRow(column(6,tags$b("1.A."), plotOutput("japan1950",height="300px")),
+                   column(6,tags$b("1.B."), plotOutput("japan2018",height="300px"))),
+          p(tags$b("Figure 1.A Population Pyramid of Japan (1950) Figure 1.B Population Pyramid of Japan (2018) ")),
+          p(tags$b("1.A."), "The population pyramid depicts a broad base which tapers towards the top, indicating that
+            there is a high birth rate and lower life expectancy. This shape is reflective of the larger proportion of younger 
+            individuals and smaller number of elderly individuals. Males are represented in blue, and females in red, gender
+            distribution is generally balanced across most age groups though there are more elderly women compared to men in the 65+ age
+            group. "),
+          p(tags$b("1.B."), "The population pyramid has a narrower base and a wider top, indicative of the low birth rate and increased proportion 
+            of elderly individuals."),
+          
+          p(tags$b("The UK"),"also is experiencing an ageing population, with around 18% if its population aged 65 and older. The UK also has a
+            sub-replacement fertility rate and mortality rates have similarly decreased over time. Figure 2 illustrates the demographic shift towards 
+            an ageing population in the UK."),
+          fluidRow(column(6,tags$b("2.A."), plotOutput("uk1950",height="300px")),
+                   column(6,tags$b("2.B."), plotOutput("uk2018",height="300px"))),
+          p(tags$b("Figure 2.A Population Pyramid of UK (1950) Figure 2.B Population Pyramid of UK (2018) ")),
+          p(tags$b("2.A."), "The population pyramid for the UK in the 1950 displays a broad base that gradually narrows towards the top, indicating 
+          the high birth rate and low life expectancy at the time. The shape is reflective of the higher proportion of younger individuals."),
+          p(tags$b("2.B."),"The population pyramid for the UK in 2018 shows a gradual increase in the older population which a moderately narrow base 
+            and an expanded middle section. This reflects a lower birth rate and a growing proportion of individuals aged 50-55. "),
+          p(tags$b("Sub-Replacement Fertility Rate  ")),
+          p("The number of births is lower than the number necessary to maintain population size – this is attributed to many socio-economic factors."),
+          p("In Japan, Increased cost of living has disincentivised having children as expenses related to housing and education are substantial. There is 
+            also a cultural expectation to have children only after marriage which incurs another set of costs – this is reflected in the fact that only 
+            2.2% of Japanese children are born outside of marriage. Furthermore, the poor work-life balance as a result of long working hours and overtime 
+            expectations leaves very little time for family life."),
+          p("In the UK, childcare costs are prohibitively high – this in conjunction with higher educational attainment and career ambition have led to the 
+            prioritisation of professional growth over childbearing.")
+          
+          
+          
+          
+          
+          )
 )
 
 
@@ -339,6 +382,10 @@ server <- function(input, output) {
         ggtitle("Death Rate over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
   })
+  output$japan1950 <- renderPlot(plot_age_pyramid("JPN",1950))
+  output$japan2018 <- renderPlot(plot_age_pyramid("JPN",2018))
+  output$uk1950 <- renderPlot(plot_age_pyramid("GBR_NP",1950))
+  output$uk2018 <- renderPlot(plot_age_pyramid("GBR_NP",2018))
   
 
   
