@@ -7,6 +7,7 @@ library(sf)
 library(rnaturalearth)
 library(rnaturalearthdata)
 
+
 predicttest <- data.frame(Country=c("U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K.","U.K."),
                           Year=c(2019,2019,2019,2020,2020,2020,2021,2021,2021,2022,2022,2022,2023,2023,2023),
                           Type=c("Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total","Male","Female","Total"),
@@ -201,8 +202,7 @@ ui <- page_navbar(
             ))
   ),
   nav_panel(title="Case Study: U.K. vs Japan",
-            includeMarkdown("Case Study.Rmd")
-          )
+          "Economic prosperity gives rise to significant lifestyle changes, allowing for the prioritisation of careers and education over family formation. Both the UK and Japan, as high-income countries have lower mortality and birth rates due to factors such as increased educational and career opportunities for women, higher living costs and wide-spread access to healthcare and family planning. While these trends reflect advancements in socio-economic conditions and medical access, they are also indicative of the challenges of population ageing. ")
 )
 
 
