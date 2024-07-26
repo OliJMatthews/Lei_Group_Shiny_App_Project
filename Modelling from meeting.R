@@ -274,6 +274,6 @@ final_death_rate_model <- glm(formula = Grouped_Death_Count ~ Age_Group + log(Ye
 
 final_death_rate_predictions$Predicted_Death_Rate <- predict(final_death_rate_model,newdata = final_death_rate_predictions,type = "response") 
 
-write.csv(final_birth_rate_predictions,"~/Lei_Group_Shiny_App_Project/Death_Rate_Predictions.csv")
+write.csv(final_death_rate_predictions,"~/Lei_Group_Shiny_App_Project/Death_Rate_Predictions.csv")
 
-
+write.csv(deaths_data,"~/Lei_Group_Shiny_App_Project/Deaths_Data.csv")
