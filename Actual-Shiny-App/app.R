@@ -203,49 +203,136 @@ ui <- page_navbar(
             ))
   ),
   nav_panel(title="Case Study: U.K. vs Japan",
-          p("Economic prosperity gives rise to significant lifestyle changes, allowing for the prioritisation of careers and 
+            p("Economic prosperity gives rise to significant lifestyle changes, allowing for the prioritisation of careers and 
             education over family formation. Both the UK and Japan, as high-income countries have lower mortality and birth rates 
             due to factors such as increased educational and career opportunities for women, higher living costs and wide-spread 
             access to healthcare and family planning. While these trends reflect advancements in socio-economic conditions and medical 
             access, they are also indicative of the challenges of population ageing."),
-          p(tags$b("Japan") ,"has the highest proportion of elderly citizens in the world, with over 28% of its population aged 65 and older.
+            p(tags$b("Japan") ,"has the highest proportion of elderly citizens in the world, with over 28% of its population aged 65 and older.
             This demographic shift is due to Japan’s sub-replacement fertility rate and decreased mortality rates. Figure 1 provides a visual
             representation of the age distribution across different gender groups in Japan. "),
-          fluidRow(column(6,tags$b("1.A."), plotOutput("japan1950",height="300px")),
-                   column(6,tags$b("1.B."), plotOutput("japan2018",height="300px"))),
-          p(tags$b("Figure 1.A Population Pyramid of Japan (1950) Figure 1.B Population Pyramid of Japan (2018) ")),
-          p(tags$b("1.A."), "The population pyramid depicts a broad base which tapers towards the top, indicating that
+            fluidRow(column(6,tags$b("1.A."), plotOutput("japan1950",height="300px")),
+                     column(6,tags$b("1.B."), plotOutput("japan2018",height="300px"))),
+            p(tags$b("Figure 1.A Population Pyramid of Japan (1950) Figure 1.B Population Pyramid of Japan (2018) ")),
+            p(tags$b("1.A."), "The population pyramid depicts a broad base which tapers towards the top, indicating that
             there is a high birth rate and lower life expectancy. This shape is reflective of the larger proportion of younger 
             individuals and smaller number of elderly individuals. Males are represented in blue, and females in red, gender
             distribution is generally balanced across most age groups though there are more elderly women compared to men in the 65+ age
             group. "),
-          p(tags$b("1.B."), "The population pyramid has a narrower base and a wider top, indicative of the low birth rate and increased proportion 
+            p(tags$b("1.B."), "The population pyramid has a narrower base and a wider top, indicative of the low birth rate and increased proportion 
             of elderly individuals."),
-          
-          p(tags$b("The UK"),"also is experiencing an ageing population, with around 18% if its population aged 65 and older. The UK also has a
+            
+            p(tags$b("The UK"),"also is experiencing an ageing population, with around 18% if its population aged 65 and older. The UK also has a
             sub-replacement fertility rate and mortality rates have similarly decreased over time. Figure 2 illustrates the demographic shift towards 
             an ageing population in the UK."),
-          fluidRow(column(6,tags$b("2.A."), plotOutput("uk1950",height="300px")),
-                   column(6,tags$b("2.B."), plotOutput("uk2018",height="300px"))),
-          p(tags$b("Figure 2.A Population Pyramid of UK (1950) Figure 2.B Population Pyramid of UK (2018) ")),
-          p(tags$b("2.A."), "The population pyramid for the UK in the 1950 displays a broad base that gradually narrows towards the top, indicating 
+            fluidRow(column(6,tags$b("2.A."), plotOutput("uk1950",height="300px")),
+                     column(6,tags$b("2.B."), plotOutput("uk2018",height="300px"))),
+            p(tags$b("Figure 2.A Population Pyramid of UK (1950) Figure 2.B Population Pyramid of UK (2018) ")),
+            p(tags$b("2.A."), "The population pyramid for the UK in the 1950 displays a broad base that gradually narrows towards the top, indicating 
           the high birth rate and low life expectancy at the time. The shape is reflective of the higher proportion of younger individuals."),
-          p(tags$b("2.B."),"The population pyramid for the UK in 2018 shows a gradual increase in the older population which a moderately narrow base 
+            p(tags$b("2.B."),"The population pyramid for the UK in 2018 shows a gradual increase in the older population which a moderately narrow base 
             and an expanded middle section. This reflects a lower birth rate and a growing proportion of individuals aged 50-55. "),
-          p(tags$b("Sub-Replacement Fertility Rate  ")),
-          p("The number of births is lower than the number necessary to maintain population size – this is attributed to many socio-economic factors."),
-          p("In Japan, Increased cost of living has disincentivised having children as expenses related to housing and education are substantial. There is 
+            p(tags$b("Sub-Replacement Fertility Rate  ")),
+            p("The number of births is lower than the number necessary to maintain population size – this is attributed to many socio-economic factors."),
+            p("In Japan, Increased cost of living has disincentivised having children as expenses related to housing and education are substantial. There is 
             also a cultural expectation to have children only after marriage which incurs another set of costs – this is reflected in the fact that only 
             2.2% of Japanese children are born outside of marriage. Furthermore, the poor work-life balance as a result of long working hours and overtime 
             expectations leaves very little time for family life."),
-          p("In the UK, childcare costs are prohibitively high – this in conjunction with higher educational attainment and career ambition have led to the 
-            prioritisation of professional growth over childbearing.")
-          
-          
-          
-          
-          
-          )
+            p("In the UK, childcare costs are prohibitively high – this in conjunction with higher educational attainment and career ambition have led to the 
+            prioritisation of professional growth over childbearing."),
+            p(tags$b("Decreased Mortality Rates")),
+            p("Japan’s mortality rates have decreased due to advancements in the medical field with vaccine rollouts and excellent health education. The 
+            healthcare system places a strong emphasis on preventative care, leading to early detection and treatment of illness. Additionally, there is a 
+            cultural belief in civic responsibility regarding health, which promotes better diets and adoption of active lifestyles."),
+            p("In the UK, improved living conditions and education – combined with widespread access to healthcare services have led to a rapid decline in 
+            mortality rate. "),
+            p("Despite these similar demographic shifts, the quality of life for elderly populations in the UK and Japan varies significantly – specifically in 
+            the management of non-communicable disease (NCD) which is seen in figure 3."),
+            p(tags$b("What are Non-Communicable Diseases? ")),
+            p("Non-communicable diseases, known more commonly as chronic diseases are the leading cause of death globally. Examples include heart disease, cancer, 
+            chronic respiratory disease and diabetes – their chronic nature requires ongoing medical care, and management. The risk of developing NCDs increases 
+            with age, consequently leading to high prevalence amongst older adults."),
+            p(tags$b("What is the significance of NCDs in healthcare? ")),
+            p(tags$u("Increased Vulnerability ")),
+            p("Non-communicable diseases pose significant challenges to healthcare systems due to the increased vulnerability of affected individuals, especially 
+            during pandemics. Evidence indicates that NCDs increased the likelihood of hospitalisation or death from COVID-19, highlighting the increased 
+            vulnerability of individuals with NCDs and the consequent strain on health services. This exemplifies the risk posed by these conditions, 
+            in regards to individual health and to the stability of healthcare systems."),
+            p(tags$u("Multimorbidity and its Complications")),
+            p("Individuals with NCDs can also suffer from multiple chronic conditions simultaneously, which is referred to as multimorbidity. They may experience 
+            chronic pain, poor mental wellbeing and impairment of daily living – affecting their independence."),
+            p("Managing NCDs incurs significant healthcare costs, including expenses related to medication, rehabilitation and long-term care as these conditions 
+            often require lifelong management which results in continuous healthcare expenditure. There are also personal losses as a result that can impact people 
+            on an individual level, absences and poor productivity as a result of illness may impact income and result in financial stress."),
+            fluidPage(plotOutput("izanncds",height="300px")),
+            p(tags$b("Figure 3: NCD Mortality Rates in Japan and the UK")),
+            p("The figure shows the trend in non-communicable disease mortality rates for Japan and the UK from the year 2000 to 2015. Japan is shown in blue while the 
+            UK is shown in red. The mortality rate in Japan has been consistently low and shows a decreasing trend over time – this is indicative of effective management 
+            and prevention of NCDs. The UK had a significantly high NCD mortality rate in the early 2000s, however with effective healthcare initiatives this has 
+            decreased. Despite this decline, the UK’s mortality rates remain significantly higher in comparison to Japan."),
+            p(tags$b("Japan’s healthcare initiatives and approach to combat NCDs.")),
+            p("Japan, despite having the oldest population in the world – has managed to maintain one of the lowest NCD mortality 
+            rates due to its proactive healthcare strategies."),
+            p(tags$u("Health and Medical Services Act for the Aged (1983)")),
+            p("This act was designed to address the onset of lifestyle related diseases through prevention, aimed at middle aged 
+            individuals to reduce the likelihood of chronic conditions as they age."),
+            p("Under this act, all citizens over the age of 40 would be provided with a free package that included personal health 
+            records, coupons for free routine health check-ups and screenings as well as follow up advice from medical professionals."),
+            p("Building on this, the Specific Health Check-ups and Guidance System was implemented in 2008. This system was designed to enforce 
+            the preventative scope of the Health and Medical Services Act – and resulted in mandatory annual health check-ups and screenings 
+            – including body height, weight, waist circumference and blood pressure in conjunction with blood lipid and glucose levels."),
+            p("This, assessed alongside medical history and self-reported lifestyle information would be used to categorise individuals into risk 
+            levels from A to D. Following this, individuals are provided with personalised health guidance based on these classifications including 
+            dietary adjustments or consultations with other medical professionals. Those in higher risk categories are encouraged to participate in 
+            more rigorous programs involving monthly monitoring."),
+            p(tags$u("Health Japan 21 ")),
+            p("In the 2000s, Japan implemented the Health Japan 21 program. This was a national campaign aimed at addressing the risk factors associated 
+            with NCD development – marking a significant shift towards a proactive approach combining individual health as a civic responsibility."),
+            p("The program focused on a range of issues including hypertension, smoking, excessive alcohol consumption, hyperlipidaemia which were outlined 
+            through the use of epidemiological studies that highlighted the prevalence of stroke and these risk factors as a primary reason for NCD death."),
+            p("An evaluation in 2018 assessed the progress and impact of Health Japan 21, some achievements included:",
+            tags$div(
+              tags$li("Decrease in health inequalities and overall health outcome improvement across different socio-economic groups "),
+              tags$li("Increased cancer screening participation"),
+              tags$li("Lower suicide rates "),
+              tags$li("Improved nutritional standards for corporations "))),
+            p(tags$u("Accessibility")),
+            p("A key factor in Japan’s success in managing NCDs is how accessible its healthcare system is for low-income groups. Widespread 
+              accessibility of ‘Check-up hospitals’, where students and employees are mandated to receive comprehensive health reports at no 
+              personal cost – ensures early detection and prevention of NCDs. This is enforced under the School Health and Safety Act and the 
+              Industrial Safety and Health Law; companies and schools must provide this and failure to comply may result in fines."),
+            p(tags$b("UKs healthcare initiatives and approach to combat NCDs.")),
+            p("The UK’s approach to combatting NCD’s is focuses on disincentivising unhealthy lifestyles."),
+            p("The Tobacco and Related Products Regulations (2016) enforced plain packaging, and advertising restrictions to reduce smoking 
+              rates which is a major risk factor for cancer, cardiovascular disease and various respiratory conditions. This is supported by 
+              free local ‘stop smoking’ services, which are easy to access and ensure a good chance of smoking cessation if used in conjunction 
+              with nicotine replacement therapy."),
+            p("To address childhood obesity and prevent the development of NCDs later in life, the UK introduced the Soft Drinks Industry Levy in 
+              2018 – this levy introduced a tax on sugary drinks to reduce excessive sugar consumption among children. Supporting this initiative, 
+              the ‘Change4Life’ campaign promotes healthy eating and regular physical activity through resources and activities aimed at families and children."),
+            p("The UK emphasises early detection of NCDs through the provision of free optional health checks for individuals aged 40-74. These checks aim to identify 
+              early signs of conditions such as heart disease, diabetes, and stroke allowing for timely management."),
+            p(tags$b("The UK NHS Long Term Plan")),
+            p("The NHS aims to implement early detection services while supporting individuals in becoming actively involved in their own health management. Addressing 
+              health inequalities is a core component of the program, recognising that people in the most deprived groups often develop chronic illnesses a decade earlier 
+              than those in the least deprived groups. "),
+            p(tags$u("Social Determinants of Health and NCDs")),
+            p("The social determinants of health (SDH) are non-medical factors that impact health outcomes, these can include economic stability, access to healthcare, 
+              built environment and education. These determinants are closely linked to behavioural risk factors for non-communicable diseases (NCDs) such as poor diet, 
+              sedentary lifestyles, tobacco smoking and alcohol consumption."),
+            p("Obesity is closely interlinked with SDHs, economic constraints limit the ability of lower income individuals to follow recommended dietary guidelines. 
+              Households in the bottom income decile would have to spend over 70% of their income in order to follow recommended health guidelines. Balancing costs of 
+              utilities, rent and healthy food becomes difficult, forcing many people to choose cheaper and less nutritious options. The accessibility and affordability 
+              of fast food, in conjunction with its convenience make it an attractive option for those struggling financially."),
+            p("Lower socioeconomic groups are more likely to consume higher levels of alcohol. The psychological stress of deprivation can often lead to poor coping mechanisms 
+              such as smoking, excessive alcohol consumption and comfort eating. Countries have seen significant increases in alcohol related mortality during times of economic 
+              duress, this is pattern is seen on a microcosmic level in lower socioeconomic groups."),
+            p("Addressing these SDHs may be key to reducing deaths from NCDs.")
+            
+            
+            )
+            
+            
 )
 
 
@@ -386,12 +473,36 @@ server <- function(input, output) {
   output$japan2018 <- renderPlot(plot_age_pyramid("JPN",2018))
   output$uk1950 <- renderPlot(plot_age_pyramid("GBR_NP",1950))
   output$uk2018 <- renderPlot(plot_age_pyramid("GBR_NP",2018))
-  
-
+  output$izanncds <- renderPlot({NCD <- read_csv("NCD.csv", 
+                                                 col_types = cols(IndicatorCode = col_skip(), 
+                                                                  Indicator = col_skip(), ValueType = col_skip(), 
+                                                                  ParentLocationCode = col_skip(), 
+                                                                  ParentLocation = col_skip(), `Location type` = col_skip(), 
+                                                                  Location = col_skip(), `Period type` = col_skip(), 
+                                                                  IsLatestYear = col_skip(), `Dim1 type` = col_skip(), 
+                                                                  Dim1 = col_skip(), Dim1ValueCode = col_skip(), 
+                                                                  `Dim2 type` = col_skip(), Dim2 = col_skip(), 
+                                                                  Dim2ValueCode = col_skip(), `Dim3 type` = col_skip(), 
+                                                                  Dim3 = col_skip(), Dim3ValueCode = col_skip(), 
+                                                                  DataSourceDimValueCode = col_skip(), 
+                                                                  DataSource = col_skip(), FactValueNumericPrefix = col_skip(), 
+                                                                  FactValueUoM = col_skip(), FactValueNumericLowPrefix = col_skip(), 
+                                                                  FactValueNumericLow = col_skip(), 
+                                                                  FactValueNumericHighPrefix = col_skip(), 
+                                                                  FactValueNumericHigh = col_skip(), 
+                                                                  Value = col_skip(), FactValueTranslationID = col_skip(), 
+                                                                  FactComments = col_skip(), Language = col_skip(), 
+                                                                  DateModified = col_skip()))
+                                
+                                ggplot(NCD)+
+                                  geom_line(aes(x=Period,y=FactValueNumeric,color=SpatialDimValueCode))+
+                                  theme_minimal()+
+                                  labs(title = "NCD Mortality Rates over Time")+
+                                  xlab("Year")+
+                                  ylab("Non-Communicable Disease Rate")
+  })
   
 }
-
-
 
 
 
