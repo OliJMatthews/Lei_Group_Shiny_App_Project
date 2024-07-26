@@ -14,7 +14,7 @@ birth_data <- Rates %>%
   filter(Year > 1949) %>%
   mutate(Year = Year - min(Year)) %>%
   dplyr::select(-Type) %>%
-  mutate(Year = Year+1949)
+  mutate(Year = Year + 1949)
 
 ################################################################################
 
@@ -50,7 +50,7 @@ exp(coef(birth_rate_model_poisson))
 
 # Try also using a Poisson model but with robust standard errors
 
-birth_rate_model_nb <- glm.nb(formula = Birth_Count ~ Year + Country + Type + offset(log(Pop_Count)),
+birth_rate_model_nb <- glm.nb(formula = Birth_Count ~ Year + Country +  offset(log(Pop_Count)),
                                 data = birth_data, link=log) 
 summary(birth_rate_model_nb)
 exp(coef(birth_rate_model_nb))
@@ -110,9 +110,9 @@ with(predicted[predicted$Country=="Sweden",], points(Year,log(Birth_Rate),col="b
 # Using splines
 predicted<-birth_data[c("Country","Year","Birth_Rate")]
 predicted$Pop_Count<-1000
-birth_rate_model_poisson_splines <- glm(formula = Birth_Count ~ splines::ns(Year,df=15) + log(Year) +  Country + Year:Country + offset(log(Pop_Count)),
+birth_rate_model_poisson_splines <- glm(formula = Birth_Count ~ Country*Year + log(Year) + offset(log(Pop_Count)),
                                         data = birth_data,
-                                        family = poisson(link="log")) 
+                                        family = poisson(link="log"))
 summary(birth_rate_model_poisson_splines)
 
 predicted$Predicted_Birth_Rate_Splines<-predict(birth_rate_model_poisson_splines,predicted,type = "response")
@@ -183,12 +183,19 @@ deaths_data <- deaths_data %>%
   filter(Pop_Count > 0 ) %>%
   filter(Year > 1949) %>%
   filter(Year < 2019) %>%
-  mutate(Year = (Year - 1949)) %>%
   mutate(Sex = factor(Sex)) %>%
   mutate(Death_Count = ceiling(Death_Count)) %>%
   mutate(Age_Group = cut(Age,c(seq(0,100,by=5),Inf),inlude.lowest = TRUE, right = FALSE)) %>%
-  group_by(Country,Year,Sex,Age_Group) %>% 
-  mutate(Grouped_Death_Count = sum(Death_Count),Grouped_Pop_Count = sum(Pop_Count))
+  group_by(Country,Year,Age_Group) %>% 
+  reframe(
+    Country,
+    Year,
+    Age_Group,
+    Grouped_Death_Count = sum(Death_Count),
+    Grouped_Pop_Count = sum(Pop_Count),
+  ) %>%
+  unique() %>%
+  mutate(Death_Rate = (Grouped_Death_Count / Grouped_Pop_Count * 1000)) 
 
 death_rate_model_gamma <- glm(formula = Death_Count ~ Sex + Year + Country + offset(log(Pop_Count)),
                               data = deaths_data,
@@ -229,47 +236,44 @@ exp(coef(death_rate_model_gamma))
 summary(death_rate_model_gamma)
 exp(coef(death_rate_model_gamma))
 
-predicted<-deaths_data[c("Country","Year","Age","Sex","Death_Count","Pop_Count")]
+predicted<-deaths_data[c("Country","Year","Age_Group","Death_Rate")]
 predicted <- predicted %>%
-  mutate(Death_Rate = (Death_Count / Pop_Count * 1000)) %>%
-  mutate(Predicted_Death_Rate = predict(death_rate_model_poisson)) %>%
-  mutate(Pop_Count = 1000)
+  mutate(Death_Rate = (Grouped_Death_Count / Grouped_Pop_Count * 1000))
 
-death_rate_model_poisson <- glm(formula = Grouped_Death_Count ~ Age_Group*Year*Country + offset(log(Grouped_Pop_Count)),
+death_rate_model_poisson <- glm(formula = Grouped_Death_Count ~ Age_Group + log(Year) + Country + +Age_Group:Country + Year:Age_Group + Year:Country + offset(log(Grouped_Pop_Count)),
                                 data = deaths_data,
                                 family = poisson(link="log")) 
-summary(death_rate_model_gamma)
-exp(coef(death_rate_model_gamma))
+summary(death_rate_model_poisson)
+exp(coef(death_rate_model_poisson))
 
-summary(death_rate_model_gamma)
-exp(coef(death_rate_model_gamma))
 
-predicted<-deaths_data[c("Country","Year","Age","Sex","Death_Count","Pop_Count")]
+predicted<-deaths_data[c("Country","Year","Age_Group","Death_Rate")]
 predicted <- predicted %>%
-  mutate(Death_Rate = (Death_Count / Pop_Count * 1000)) %>%
-  mutate(Predicted_Death_Rate = predict(death_rate_model_poisson)) %>%
-  mutate(Pop_Count = 1000)
+  mutate(Grouped_Pop_Count = 1000)
+
+predicted$Predicted_Death_Rate <- predict.glm(death_rate_model_poisson, newdata = predicted, type = "response")
 
 
-with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Male",], plot(Year,log(Predicted_Death_Rate),ylim = c(-2,1.5),col="red"))
-with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Female",], points(Year,log(Predicted_Death_Rate),col="blue"))
-with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Male",], points(Year,log(Death_Rate),col="red",pch = 4))
-with(predicted[predicted$Country=="Australia" & predicted$Age==10 & predicted$Sex=="Female",], points(Year,log(Death_Rate),col="blue",pch = 4))
+with(predicted[predicted$Country=="Australia" & predicted$Age_Group == "[85,90)",], plot(Year,log(Predicted_Death_Rate),ylim=c(0,6),col="red"))
+with(predicted[predicted$Country=="Australia" & predicted$Age_Group == "[85,90)",], points(Year,log(Death_Rate),col="blue",pch = 4))
 
 ################################################################################
 final_birth_rate_predictions <- expand.grid(Country = Countries,Year = 2018:2030,Pop_Count = 1000) 
-final_birth_rate_model <- glm(formula = Birth_Count ~ splines::ns(Year,df=15) + Country*Year + log(Year) + offset(log(Pop_Count)),
+final_birth_rate_model <- glm(formula = Birth_Count ~ Country*Year + log(Year) + offset(log(Pop_Count)),
                                                      data = birth_data,
                                                      family = poisson(link="log"))
 final_birth_rate_predictions$Predicted_Birth_Rate <- predict(final_birth_rate_model,newdata = final_birth_rate_predictions,type = "response") 
-final_birth_rate_predictions$Year <- final_birth_rate_predictions$Year
-
-
 
 write.csv(final_birth_rate_predictions,"~/Lei_Group_Shiny_App_Project/Birth_Rate_Predictions.csv")
 
 
-final_death_rate_predictions <- expand.grid(Country = Countries,Age = 0:110,Year = 2018:2030 - 1949,Pop_Count = 1000)
-final_birth_rate_predictions$Predicted_Death_Rate <- predict(birth_rate_model_poisson_splines,newdata = final_birth_rate_predictions) 
+final_death_rate_predictions <- expand.grid(Country = Countries,Age_Group = levels(deaths_data$Age_Group),Year = 2018:2030,Grouped_Pop_Count = 1000)
+final_death_rate_model <- glm(formula = Grouped_Death_Count ~ Age_Group + log(Year) + Country + +Age_Group:Country + Year:Age_Group + Year:Country + offset(log(Grouped_Pop_Count)),
+    data = deaths_data,
+    family = poisson(link="log")) 
+
+final_death_rate_predictions$Predicted_Death_Rate <- predict(final_death_rate_model,newdata = final_death_rate_predictions,type = "response") 
+
+write.csv(final_birth_rate_predictions,"~/Lei_Group_Shiny_App_Project/Death_Rate_Predictions.csv")
 
 
