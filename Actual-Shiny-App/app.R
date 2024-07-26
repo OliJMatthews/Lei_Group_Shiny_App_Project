@@ -200,7 +200,8 @@ ui <- page_navbar(
               )
             ))
   ),
-  nav_panel(title="Case Study: U.K. vs Japan"
+  nav_panel(title="Case Study: U.K. vs Japan",
+            includeMarkdown("Case Study.Rmd")
           )
 )
 
@@ -233,20 +234,14 @@ server <- function(input, output) {
     country_name <- click$id  # Extract the clicked country name
     output$country_name <- renderText({
       paste("You clicked on:", country_name)})})
-  
   reactivepyramidctry <- reactive({click <- input$map_shape_click
   country_name <- click$id
   result <- getCountryCode(country_name)
   return(result)})
-  
   output$pyramid <- renderPlot({req(input$map_shape_click)
-    
     plot_age_pyramid(reactivepyramidctry(),input$year)})
-  
   output$prompttext <- renderText({req(!isTruthy(input$map_shape_click))
     return("Please Click on a Country")})
-  
-  
   output$createlongplot <- renderPlot({
     req(input$map_shape_click)
     click <- input$map_shape_click
@@ -298,7 +293,6 @@ server <- function(input, output) {
         ggtitle("Death Rate over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
   })
-  
   output$comparisonplot <- renderPlot({
     req(input$countrycomp)
     country <- input$countrycomp
@@ -345,6 +339,8 @@ server <- function(input, output) {
         ggtitle("Death Rate over Time")+
         theme(plot.title = element_text(hjust = 0.5))}
   })
+  
+
   
 }
 
